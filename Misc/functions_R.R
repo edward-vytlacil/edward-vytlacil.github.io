@@ -1,3 +1,8 @@
+
+# This R script is a supplement to the handout for Lab 1:
+# https://edward-vytlacil.github.io/Labs/Lab1/Lab1_Handout_Summer_2022.html
+# reviewing user-defined functions 
+
 # if you haven't already installed ggplot
 # then uncomment the following line:
 # install.packages("ggplot2")
