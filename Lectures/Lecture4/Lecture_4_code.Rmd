@@ -1,0 +1,257 @@
+---
+title: 'Lab 1: Part V: Randomization Inference'
+output:
+  html_document:
+    df_print: paged
+fig_caption: yes
+---
+
+```{r setup, include=FALSE}
+rm(list = ls())
+knitr::opts_chunk$set(echo = TRUE)
+library(stargazer, quietly=TRUE)
+library(ggplot2, quietly = TRUE)
+library(plotly)
+library(ri2, quietly = TRUE)  # package for randomization inference.
+library(Hmisc)
+
+
+```
+
+##  Setup, This is Just Part I of the lab repeated, loading data
+
+###1.
+```{r}
+
+#setwd("~/Dropbox/Under_Metrics_Curriculum/econ123/Fall_2021/Lab1/code")  #path, my laptop, mac #path, my laptop, mac
+ 
+df_ <- read.table("PROGRESA.csv", header=TRUE, sep=",") # import csv
+
+ 
+df<-subset(df_,age1>=6 & age1<=19 & (wave==5 | wave==2) )
+
+df$treat <- df$progresa1 # renaming treatment variable for convenience
+
+df$fem <- df$sex1 # renaming sex variable for convenience
+
+
+
+
+df$post <- ifelse(df$wave==5, 1, 0) # creating variable "post" that is equal
+
+
+dfPre <- df[df$post==0,] #creating subset for pre (baseline) period
+dfPost <- df[df$post==1,] #creating subset for post period
+
+
+
+```
+
+
+
+## Part 5. Randomization Test to compute p-values in 5 villages -- Fixing Ideas
+## with just 5 villages, using   using ri2 library.  make sure to 
+## install and load ri2
+  
+
+```{r }
+
+# aggregating data to village level, same as first part of slides
+
+dfpost5  <- subset(dfPost, sooloca %in% c(1, 2, 3, 4, 13)) 
+dfpost5$sooloca <- ifelse(dfpost5$sooloca==13,5,dfpost5$sooloca)
+s.0 <- with(dfpost5,tapply(school, sooloca, mean))
+t.0 <- with(dfpost5,tapply(treat, sooloca, mean))
+tab5 <- data.frame(school=s.0,treat=t.0)
+
+tab5
+
+#how many ways could we have assigned
+#treatment to 3 of the 5 villages?
+choose(5,3)
+
+#declare random assignment mechanism, choose 3 out of 5 for treatment.
+declaration_ra <- declare_ra(N=5, m=3)  
+
+# create matrix of all 10 possible treatment assignments corresponding to
+# choosing 3 out of 5 for treatment
+permutation_matrix <- obtain_permutation_matrix(declaration_ra)
+
+# 
+ri_out <- conduct_ri(
+  test_function = 
+          function(d){with(d, abs(mean(d[treat==1,]$school) - mean(d[treat==0,]$school)))},  #defining test statistic
+  declaration = declaration_ra,  #random assignment mechanism defined above.
+  assignment = "treat",  #treatment variable
+  outcome = "school",   #outcome variable
+  data = tab5,          #data frame
+  permutation_matrix = permutation_matrix)  #matrix of all possible treatment assignments defined above.
+
+summary(ri_out)
+plot(ri_out)
+
+
+```
+
+# Now same thing but treating the unit as an individual but 
+# recognizign that the randomizatoin is at the village level.
+
+```{r }
+
+n.0<- length(unique(dfpost5$sooloca))  # number of villages
+m.0<- length(unique(subset(dfpost5,dfpost5$progresa1==1)$sooloca))  # number of treated villages
+
+declaration_ra.2<-declare_ra(N=n.0,m=m.0,clusters=dfpost5$sooloca)  # randomizatoin mechanism, randomizatoin at village level
+
+permutation_matrix.2 <- obtain_permutation_matrix(declaration_ra.2) # matrix of all possible random assignments
+
+ri_out.2 <- conduct_ri(
+  test_function = 
+          function(d){with(d, abs(mean(d[treat==1,]$school) - mean(d[treat==0,]$school)))},  #defining test statistic
+  declaration = declaration_ra.2,  #random assignment mechanism defined above.
+  assignment = "treat",  #treatment variable
+  outcome = "school",   #outcome variable
+  data = dfpost5,          #data frame, using individual level data frame
+  permutation_matrix = permutation_matrix.2)  #matrix of all possible treatment assignments defined above.
+ 
+
+summary(ri_out.2)
+plot(ri_out.2)
+
+```
+
+ 
+### What if we tried doing same on full data set?  Impossible.
+### Too many permutations to create
+### full matrix of permutations, to consider all permutations.
+
+
+```{r }
+
+n.0<- length(unique(dfPost$sooloca))
+m.0<- length(unique(subset(dfPost,dfPost$progresa1==1)$sooloca))
+
+n.0
+m.0
+
+choose(n.0,m.0)
+```
+
+### Now same thing using ri2 package but using full data set.  Simulate
+### draws from the full 2.452172e+139 possible number of possible permutations.
+
+
+```{r }
+
+sims<-3000  # defining constant, number of simualations to do
+ 
+# 
+# defining function for randomizatoin inference
+# argument is the data frame, make it easier to do 
+# on alterantive subsets of data
+#
+
+f.ri <- function(d){
+  
+n.0<- length(unique(d$sooloca))
+m.0<- length(unique(subset(d,d$treat==1)$sooloca))
+
+declaration_ra<-declare_ra(N=n.0,m=m.0,clusters=d$sooloca)
+
+ri_out <-  conduct_ri(
+     test_function = 
+      function(d){with(d, abs(mean(d[treat==1,]$school) - mean(d[treat==0,]$school)))},  #defining test statistic
+    declaration = declaration_ra,
+    assignment = "treat",
+      outcome = "school",
+    data = d,
+    sims = sims
+  )
+ri_out}
+
+# full sample
+
+ri.fullsample<- f.ri(dfPost)
+summary(ri.fullsample)
+plot(ri.fullsample)
+
+
+# same as above, but now
+# separately by boys vs girls
+
+ri.bysex<- by(dfPost, dfPost$fem,f.ri)  # "by"" similar to tapply, applying f.ri to dfPost by levels of dfPost$fem
+summary(ri.bysex[[1]]) # boys
+summary(ri.bysex[[2]]) # girls
+plot(ri.bysex[[1]]) +ggtitle("Randomization Inference of Sharp Null of No Effect, Boys")
+plot(ri.bysex[[2]]) +ggtitle("Randomization Inference of Sharp Null of No Effect, Girls")
+
+# same as above, but now
+# separately by (sex,highest grade completed)
+
+ri.bysexgrade <- by(dfPost, list(dfPost$fem,dfPost$hgc1),f.ri)
+pvalues.boys <- sapply(1:10,function(j){summary(ri.bysexgrade[[1,j]])$two_tailed_p_value} ) 
+pvalues.girls <- sapply(1:10,function(j){summary(ri.bysexgrade[[2,j]])$two_tailed_p_value} )
+results.p<-cbind(1:10,pvalues.boys,pvalues.girls)
+results.names <- c("Grade","p-value boys","p-value girls")
+colnames(results.p)<-results.names
+
+# Use stargazer to report a  table. 
+
+stargazer(results.p,  digits=3, type="text", title="randomization inference p-values, inference by sex and grade")
+ 
+#example plot, girls 6th grade
+plot(ri.bysexgrade[[2,6]]) +ggtitle("Randomization Inference of Sharp Null of No Effect, Girls, Grade 6")
+
+
+```
+
+
+#
+# Another common method for inference in this context is to consider a t-test 
+# instead of randomization inference.  We will cover t-test, and justification,
+# later in this course after covering asymptotic inference.
+# Do you know what would justify t-test in this context?  what null would be tested?
+# good/bad idea in this context?  should we use equal or unequal variance?
+# any way to modify to adjust for dependence within villages?
+# We will return to these questions 
+
+```{r }
+
+fullsample.tt<-with(dfPost, t.test(school ~  treat, alternative = "two.sided", conf.level = 0.95,var.equal=TRUE))
+
+print(paste0("full sample, p-value from 2-sided t-test: ",fullsample.tt$p.value)) 
+print(paste0("recall full sample, p-value from randomization inference: ",summary(ri.fullsample)$two_tailed_p_value)) 
+print("recall testing difference null hypotheses, different justifications/assumptions")
+
+f.ttest <- function(d){with(d, t.test(school ~  treat, alternative = "two.sided", conf.level = 0.95,var.equal=TRUE))} 
+
+#
+# check number of observations by sex*hgc1
+# with(dfPost,tapply(sooind_id, list(fem,hgc1),  function(x){length(unique(x))}))
+# now do separately by (sex,highest grade completed)
+# ttest.bysexgrade <- by(dfPost, list(dfPost$fem,dfPost$hgc1),f.ttest)
+# above results in error message, why?
+# check means and sd by cell 
+# by(dfPost$school, list(dfPost$fem,dfPost$hgc1),mean)
+# by(dfPost$school, list(dfPost$fem,dfPost$hgc1),sd)
+# what is mean and sd of school for girls with HGC1=0?  Why does that cause a problem?
+
+dfPost.1p <- subset(dfPost, hgc1>0)
+
+ttest.bysexgrade <- by(dfPost.1p, list(dfPost.1p$fem,dfPost.1p$hgc1),f.ttest)
+pvalues.tt.boys <- sapply(1:9,function(j){ttest.bysexgrade[[1,j]]$p.value} ) 
+pvalues.tt.girls <- sapply(1:9,function(j){ttest.bysexgrade[[2,j]]$p.value} ) 
+results.tt.p<-cbind(1:9+1,pvalues.tt.boys,pvalues.tt.girls)
+results.names <- c("Grade","p-value boys","p-value girls")
+colnames(results.tt.p)<-results.names
+
+# Use stargazer to report a  table. 
+
+stargazer(results.tt.p,  digits=3, type="text", title="t-test p-values, inference by sex and grade")
+ 
+# compare table using randomization inference
+stargazer(results.p,  digits=3, type="text", title="randomization inference p-values, inference by sex and grade")
+
+# how would you compare to results using randomization inferenece?
+
+```
