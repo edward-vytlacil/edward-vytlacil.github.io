@@ -1,0 +1,342 @@
+---
+title: "Reporting Regression Results with Stargazer"
+author: "Edward Vytlacil"
+date: "June 22, 2022"
+toc: true
+format:
+   html:
+    html-math-method: katex
+    code-tools: true
+    self-contained: true
+execute:
+  warning: false
+reference-location: margin
+citation-location: margin
+bibliography: handouts.bib
+---
+
+## Introduction
+
+`stargazer` is an **R** package for producing publication-ready tables that is especially well-suited for reporting multiple sets of regression results in the standard format for academic papers in economics. A more complete description of the package is provided by [@hlavac2015stargazer](https://cran.r-project.org/web/packages/stargazer/vignettes/stargazer.pdf). Jake Russ has posted a very useful [stargazer cheatsheet](https://www.jakeruss.com/cheatsheets/stargazer/)
+
+In this handout, we will illustrate the use of `stargazer` to report regression results. Before we use the package, make sure that you have `stargazer` installed and loaded.
+
+```{r}
+#| label: load-packages
+#| echo: true
+#| code-fold: true
+#install.packages("stargazer")     # if not already installed  
+library("stargazer")
+```
+
+## Application
+
+Our regressions we will based upon [@duflo2011peer](https://www.aeaweb.org/articles?id=10.1257/aer.101.5.1739), and they have made their data available [here](https://www.openicpsr.org/openicpsr/project/112446/version/V1/view). The data is based on a randomized experiment of schools in Kenya, where some schools were randomized to have "tracking" in first grade (high-acheiving students taught separately from low-acheiving students, with the caterogization based on a test score at the beginning of first grade) and others not to have tracking (high and low acheiving students taught together). In addition, some first grade classrooms were taught by a "contract teacher" with greater incentives to teach well. Their goal is to examine the effect of tracking and having a contract teacher on acadeemic performance as measured by a test at the end of first grade. They additionally wish to examine whether the effect of tracking is the same for high-acheiving as low-acheiving students.
+
+The data set we will use in this handout, based on their data, can be downloaded as an .RDS file from my dropbox folder [here](https://www.dropbox.com/s/i422zsw2cjbeaku/for_peer_paper_PS.RDS?dl=0). Our regressions and table of regression output is motivated by tables in their paper. The data includes the following variables:
+
+-   `tracking` is the dummy variable that denotes whether the student is in a tracking school,
+-   `percentile` is the the student's initial achievement test score,
+-   `bottomhalf` is a dummy variable for whether the student's initial achievement was in the bottom half of the initial achievement distribution,
+-   `stdR_totalscore` is normalized total (end) test score, normalized to have mean 0 and standard deviation 1 in the nontracking schools.
+-   `etpteacher` is a dummy variable for being assigned to a contract teacher.
+-   `girl` is a dummy variable for the student being female.
+-   `agetest` is age of the student at time of (end) test
+-   `schoolid` is a unique id variable for the school.
+
+```{r}
+#| label: load-data
+#| echo: true
+#| code-fold: true
+
+df <- readRDS("/Users/ev6/Dropbox/ViaX/Workshop_Files_Summer_22/Duflo_et_al/for_peer_paper_PS.RDS")
+```
+
+## Regressions
+
+First, we will run three regressions with alternative model specifications.[^1]
+
+[^1]: Note the `lm` syntax `y ~ x1+x2` regresses $y$ on $x_1$ and $x_2$, while the synatx `y ~ x1*x2` regresses $y$ on $x_1$, $x_2$ and the interaction between $x_1$ and $x_2$. **R** will name the interaction term `x1:x2`.
+
+```{r}
+#| label: run regressions
+#| echo: true
+
+reg.1 <- lm(stdR_totalscore ~ tracking+etpteacher, data=df)
+reg.2 <- lm(stdR_totalscore ~ tracking+etpteacher+
+              percentile+girl+agetest, data=df)
+reg.3 <- lm(stdR_totalscore ~ tracking*bottomhalf+etpteacher+
+              percentile+girl+agetest, data=df) 
+```
+
+Now we use `stargazer` to produce a table of regression results, easily allowing us to see how the regression results change across our three regression specifications. The first arguments for the `stargazer` function are the our saved regression results, and we will then enter the `type` argument. There are three options for the `type` argument:
+
+-   `type="text"` outputs the table as ASCII (plain-text). That is perfect for looking at on RStudio, though the results are not sufficiently professional looking for publications or presentations.
+-   `type="latex"` outputs the table as [LaTeX](https://www.latex-project.org/about/) code. You can copy and paste the code directly into your .tex document if you are using LaTeX (and most academic economists use LaTeX for their research papers and presentations). I wrote the slides and problem sets for this workshop in LaTeX using [TeXShop](https://pages.uoregon.edu/koch/texshop/). LaTeX is the default option for `stargazer`.
+-   `type="html"` outputs the table as HTML, the standard markup language for web pages. This document is written in HTML.
+
+In the following, I am using the argument `type=html` though you should use `type=text` if you wish the results to be interpretable in *RStudio*.
+
+```{r }
+#| echo: true
+#| output: asis
+ 
+#stargazer(reg.1, reg.2, reg.3, type="text")
+stargazer(reg.1, reg.2, reg.3, type="html")
+```
+
+## Aesthetics, Formatting
+
+The table above is not yet in a format suitable for professional presentations or for publication. We want the table to be both more self-contained and also to have less extraneous information. For example, we want the variable names to be more self explanatory. At the same time, other information is not needed in the table, and might simply distract the reader. We want to draw the reader's attention to the important results, and not overwhelm the reader with numbers that are not important for our analysis. For example, we might not wish to report the *Adjusted* $R^2$ or the *Residual Standard Error* if those statistics are not important for the analysis. Likewise, we wish to focus the readers attention on the results for the treatment variables of interest, tracking or assignment of a contract teacher. In contrast, we may wish to include covariates such as age when taking the test and whether the child is a girl but not wish to distract the reader with the estimated coefficients on those variables. We will thus make changes to our table using the following `stargazer` arguments:
+
+-   `dep.var.label` to label the outcome variable;
+-   `covariate.labels` to label the regressors;
+-   `style` to set style formatting according to the guidelines of the *American Economic Review*;[^2]
+-   `keep` to keep the results for only some regressors, can alternatively use `omit` to drop the results for some regressors;
+-   `order` to reorder the regressors;
+-   `omit.stat` to omit some statistics we find distractign;
+-   `add.lines =` to add a line to the end of the table, which we will use to let the reader know whether the regression included additional regressors that we are not reporting;
+-   `notes` to add a footnote with additional explanation of the data and the table. I've added a footnote that is copying form the footnotes used in their papers.
+
+[^2]: You can find a list of supported `stargazer` styles [here](https://rdrr.io/cran/stargazer/man/stargazer_style_list.html)
+
+```{r }
+#| echo: true
+#| output: asis
+ 
+varlabels <- 
+  c("Tracking School","In Bottom Half x Tracking School",
+    "Contract Teacher")
+ 
+stargazer(reg.1, reg.2, reg.3,  dep.var.labels="Total Test Score",
+          type="html", style="aer", 
+          keep = c("tracking","tracking:bottomhalf","etpteacher"),
+          order = c("tracking","tracking:bottomhalf","etpteacher"),
+          covariate.labels=varlabels, 
+          omit.stat = c("LL","ser","f","adj.rsq"),
+          add.lines = list(c("Individual Controls?", "No","Yes","Yes")))
+```
+
+## Footnotes
+
+The table now looks aesthetically pleasing, has a publication-ready formatting, and is mostly (but not quite) self-contained. The table indicates which regression specifications include additional controls, but doesn't indicate what are the additional controls. That the dependent variable is test scores is now clear from the table, but not that the test score has been standardized to be standard deviation equal to one, which is important information for interpreting the magnitude of the coefficients. [Duflo et al (2011)](https://www.aeaweb.org/articles?id=10.1257/aer.101.5.1739) include these details in the footnotes to their tables, making them more self-contained. Having `stargazer` generate the footnote for you is somewhat awkward, and you may wish to add the footnote yourself to your end paper/presentation rather than have *stargazer* generate it for you. However, the following is one way to have *stargazer* generate the footnote copying some of the footnote material used in Duflo et al (2011):
+
+```{r }
+#| echo: true
+#| output: asis
+ 
+stargazer(reg.1, reg.2, reg.3,  dep.var.labels="Total Test Score",
+          type="html", style="aer", 
+          keep = c("tracking","tracking:bottomhalf","etpteacher"),
+          order = c("tracking","tracking:bottomhalf","etpteacher"),
+          covariate.labels=varlabels, 
+          omit.stat=c("LL","ser","f","adj.rsq"),
+          add.lines = list(c("Individual Controls?", "No","Yes","Yes")),
+          notes.append = FALSE, notes.align = "l",
+          notes = "\\parbox[t]{\\textwidth}{The dependent variables are normalized test total scores, with mean 0 and standard deviation 1 in the nontracking schools.  Standard errors are presented in parentheses. Individual controls included: age, gender, being assigned to the contract teacher,  initial attainment percentile, and, for model (3), dummy variable for bottom half of of the initial achievement distribution.}")
+```
+
+## Standard Errors, Confidence Intervals, P-values {#sec-default-se}
+
+By default, `stargazer` reports the standard errors in parenthesis underneath the estimated coefficients. We can use the `report` argument to determine whether to report:
+
+-   variable names ("v");\
+-   coefficients ("c");
+-   t-statistics for null that coefficient is zero ("t");
+-   p-values for null that coefficient is zero ("p");
+-   standard errors/confidence intervals ("s")
+    -   by default ("s") reports standard errors, but if argument `ci = TRUE` is used then will report 95% confidence intervals;
+
+In addition, any of the above letters followed by an asterisk will report significance stars next to the statistic.
+
+For example:
+
+-   `report = "vct*"` will report variable names, coefficients, and t-statistics, with significance stars next to the t-statistics:
+
+```{r }
+#| echo: true
+#| output: asis
+#| code-fold: true
+ 
+stargazer(reg.1, reg.2, reg.3,  dep.var.labels="Total Test Score",
+          type="html", style="aer", 
+          report = "vct*", 
+          keep = c("tracking","tracking:bottomhalf","etpteacher"),
+          order = c("tracking","tracking:bottomhalf","etpteacher"),
+          covariate.labels=varlabels, 
+          omit.stat=c("LL","ser","f","adj.rsq"),
+          add.lines = list(c("Individual Controls?", "No","Yes","Yes")))
+```
+
+-   `report = "vc*s"` will report variable names, coefficients, significance stars next to the coefficients, and standard errors in parentheses (this is the default option);
+
+```{r }
+#| echo: true
+#| output: asis
+#| code-fold: true
+ 
+stargazer(reg.1, reg.2, reg.3,  dep.var.labels="Total Test Score",
+          type="html", style="aer", 
+          report = "vc*s",  
+          keep = c("tracking","tracking:bottomhalf","etpteacher"),
+          order = c("tracking","tracking:bottomhalf","etpteacher"),
+          covariate.labels=varlabels, 
+          omit.stat=c("LL","ser","f","adj.rsq"),
+          add.lines = list(c("Individual Controls?", "No","Yes","Yes")))
+```
+
+-   `report = "vc*s", ci = TRUE` will report variable names, coefficients, significance stars next to the coefficients, and 95% CI below the parentheses;
+
+```{r }
+#| echo: true
+#| output: asis
+#| code-fold: true
+ 
+stargazer(reg.1, reg.2, reg.3,  dep.var.labels="Total Test Score",
+          type="html", style="aer", 
+          report = "vc*s", ci = TRUE,
+          keep = c("tracking","tracking:bottomhalf","etpteacher"),
+          order = c("tracking","tracking:bottomhalf","etpteacher"),
+          covariate.labels=varlabels, 
+          omit.stat=c("LL","ser","f","adj.rsq"),
+          add.lines = list(c("Individual Controls?", "No","Yes","Yes")))
+```
+
+-   `report = "vcp*"` will report variable names, coefficients, and p-vales below the parentheses with significance stars next to the p-values.
+
+```{r }
+#| echo: true
+#| output: asis
+#| code-fold: true
+ 
+stargazer(reg.1, reg.2, reg.3,  dep.var.labels="Total Test Score",
+          type="html", style="aer", 
+          report = "vcp*",
+          keep = c("tracking","tracking:bottomhalf","etpteacher"),
+          order = c("tracking","tracking:bottomhalf","etpteacher"),
+          covariate.labels=varlabels, 
+          omit.stat=c("LL","ser","f","adj.rsq"),
+          add.lines = list(c("Individual Controls?", "No","Yes","Yes")))
+```
+
+::: {.callout-note appearance="simple"}
+Note that:
+
+-   the default standard errors are only consistent under homoscedasticity;
+-   the reported confidence intervals are two-sided 95% confidence intervals. They are based on the default standard errors along with a normal approximation (estimated coefficient plus or minus 1.96 standard errors);
+-   the reported t-statistic is the estimated coefficient divided by the default standard error, and is the appropriate test statistic to use to test the null of hypothesis of a zero coefficient against a two-sided alternative using approximate normality;
+-   the p-values and the significance stars are for the null hypothesis of a zero coefficient against a two-sided alternative, use the default standard errors, and are based on approximate normality.
+
+The above observations imply that if the model is heteroscedastic, the default standard errors will be inconsistent, and, because of that, the reported confidence intervals, p-values, and significance stars will be invalid (inconsistent) and the reported t-statistic will be dividing by the wrong denominator.
+:::
+
+From my own perspective, I believe it is more interesting to see 95% confidence intervals than to see significance stars or p-values. A 95% confidence interval can be interpreted as the set of all null hypotheses we would not reject at the 5% level and thus can answer more questions than whether the null that the coefficient equals zero can be rejected at the 5% level. However, it is norm in the social sciences including economics to report estimates, standard errors, and either p-values or significance stars for the null hypothesis of a zero-coefficient, and so you should include those p-values or significance stars as that is what your readers will expect.
+
+## Heteroscedastic Robust Standard Errors
+
+As discussed above, the default standard errors and thus the default confidence intervals/p-vaues/significance-stars/t-ratios are only valid under homoscedasticity. It is rare in economics for us to believe that homoscedasticity is a reasonable assumption, and thus it is the norm in economics to instead use "heteroscedastic robust" standard errors.\
+Heteroscedastic robust standard errors are consistent under homoscedasticity but also under heteroscedasticity, and the resulting confidence-intervals, etc., are thus also consistent.
+
+We will thus use `vcovHC` from the library `sandwich` and the function `lmtest` from the library `lmtest` to report heteroscedastic-robust results. For example, to report results with heteroscedastic-robust standard errors:
+
+```{r}
+#| echo: true
+#| output: asis
+#install.packages("sandwich")     # if not already installed 
+#install.packages("lmtest")     # if not already installed  
+library("sandwich")
+library("lmtest")
+
+reg.test.1 <- coeftest(reg.1,vcov = vcovHC)
+reg.test.2 <- coeftest(reg.2,vcov = vcovHC)
+reg.test.3 <- coeftest(reg.3,vcov = vcovHC)
+
+ 
+stargazer(reg.1, reg.2, reg.3,  dep.var.labels="Total Test Score",
+          type="html", style="aer", 
+          report = "vc*s",  
+          se=list(reg.test.1[,2],reg.test.2[,2],reg.test.3[,2]),
+          p=list(reg.test.1[,4],reg.test.2[,4],reg.test.3[,4]),
+          keep = c("tracking","tracking:bottomhalf","etpteacher"),
+          order = c("tracking","tracking:bottomhalf","etpteacher"),
+          covariate.labels=varlabels, 
+          omit.stat=c("LL","ser","f","adj.rsq"),
+          add.lines = list(c("Individual Controls?", "No","Yes","Yes")),
+          notes.append = FALSE , notes.align = "l", 
+          notes = " Reporting heteroscedastic-robust standard errors in parentheses .")
+```
+
+As we saw in Section @sec-default-se, we can use `report` argument to report alternative statistics such as p-values, confidence intervals, and t-ratios. If we feed into `stargazer` heteroscedastic robust s.e. and p-values, then all of these statistics will be heteroscedastic robust (consistent even if the model is heteroscedastic.) For example:
+
+```{r }
+#| echo: true
+#| output: asis
+#| code-fold: true
+ 
+stargazer(reg.1, reg.2, reg.3,  dep.var.labels="Total Test Score",
+          type="html", style="aer", 
+          report = "vcp",  
+          se=list(reg.test.1[,2],reg.test.2[,2],reg.test.3[,2]),
+          p=list(reg.test.1[,4],reg.test.2[,4],reg.test.3[,4]),
+          keep = c("tracking","tracking:bottomhalf","etpteacher"),
+          order = c("tracking","tracking:bottomhalf","etpteacher"),
+          covariate.labels=varlabels, 
+          omit.stat=c("LL","ser","f","adj.rsq"),
+          add.lines = list(c("Individual Controls?", "No","Yes","Yes")),
+          notes.append = FALSE , notes.align = "l", 
+          notes = " Reporting heteroscedastic-robust p-values in parentheses .")
+```
+
+## Cluster-Robust Standard Errors
+
+It is common in economics to worry that the data is possibly clustered, independent across clusters but possibly correlated within a cluster. In such a situation, it is common to use "*cluster robust*" standard errors, which then results in cluster robust confidence intervals, p-values, and so forth. Cluster robust standard errors are also robust to heteroscedasticity. For example, in [Duflo et al (2011)](https://www.aeaweb.org/articles?id=10.1257/aer.101.5.1739) they report standard errors that cluster at the school level, and which are thus consistent assuming independence across schools while allowing for dependence within a school. Their reported p-values are based on those standard errors, and are thus robust to clustering at the school level.
+
+We now follow their paper in reporting cluster-robust standard errors that cluster at the school level. We do so by again using the `coeftest` function from the `lmtest` package, but now use the `vcovCL` option from the `sandwich` package with `cluster~=schoolid`.
+
+```{r}
+#| echo: true
+#| output: asis
+#install.packages("sandwich")     # if not already installed 
+#install.packages("lmtest")     # if not already installed  
+library("sandwich")
+library("lmtest")
+
+reg.test.1 <- coeftest(reg.1,vcov = vcovCL,cluster=~schoolid)
+reg.test.2 <- coeftest(reg.2,vcov = vcovCL,cluster=~schoolid)
+reg.test.3 <- coeftest(reg.3,vcov = vcovCL,cluster=~schoolid)
+
+stargazer(reg.1, reg.2, reg.3,  dep.var.labels="Total Test Score",
+          type="html", style="aer", 
+          report = "vc*sp",  
+          se=list(reg.test.1[,2],reg.test.2[,2],reg.test.3[,2]),
+          p=list(reg.test.1[,4],reg.test.2[,4],reg.test.3[,4]),
+          keep = c("tracking","tracking:bottomhalf","etpteacher"),
+          order = c("tracking","tracking:bottomhalf","etpteacher"),
+          covariate.labels=varlabels, 
+          omit.stat=c("LL","ser","f","adj.rsq"),
+          add.lines = list(c("Individual Controls?", "No","Yes","Yes")),
+          notes.append = FALSE , notes.align = "l", 
+          notes = "Robust standard errors clustered at the school level are presented in parentheses, along with robust p-values.")
+```
+
+When using cluster-robust standard errors, it is good to check on number of clusters. In some sense, the number of observations is now number of schools instead of number of children, and we have far fewer schools than children. An additional issue with cluster robust standard errors is their validity requires a large number of clusters. Thus, when using cluster-robust standard errors, it is good to check and report the number of clusters.
+
+```{r}
+#| echo: true
+#| output: asis
+
+no.schools <- length(unique(df$schoolid))
+
+stargazer(reg.1, reg.2, reg.3,  dep.var.labels="Total Test Score",
+          type="html", style="aer", 
+          report = "vc*sp",  
+          se=list(reg.test.1[,2],reg.test.2[,2],reg.test.3[,2]),
+          p=list(reg.test.1[,4],reg.test.2[,4],reg.test.3[,4]),
+          keep = c("tracking","tracking:bottomhalf","etpteacher"),
+          order = c("tracking","tracking:bottomhalf","etpteacher"),
+          covariate.labels=varlabels, 
+          omit.stat=c("LL","ser","f","adj.rsq"),
+          add.lines = list(c("Individual Controls?", "No","Yes","Yes")),
+          notes.append = FALSE , notes.align = "l", 
+          notes = paste0("Robust standard errors clustered at the school level are presented in parentheses, along with robust p-values. The data includes ",no.schools," schools."))
+```
