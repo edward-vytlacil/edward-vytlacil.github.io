@@ -3258,25 +3258,32 @@ Grep Function
 <div class="cell">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># covariate names from reg.4</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>coefs <span class="ot">&lt;-</span> <span class="fu">names</span>(<span class="fu">coef</span>(reg<span class="fl">.4</span>))</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co"># search names that include expression &quot;region&quot;</span></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co"># grep returns indices that include expressiom</span></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="fu">grep</span>(<span class="st">&quot;region&quot;</span>,coefs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>coefs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] &quot;(Intercept)&quot;        &quot;female&quot;             &quot;education&quot;         
+ [4] &quot;exp&quot;                &quot;I(exp^2)&quot;           &quot;as.factor(region)2&quot;
+ [7] &quot;as.factor(region)3&quot; &quot;as.factor(region)4&quot; &quot;female:education&quot;  
+[10] &quot;female:exp&quot;         &quot;female:I(exp^2)&quot;   </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># search names that include expression &quot;region&quot;</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co"># grep returns indices that include expressiom</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="fu">grep</span>(<span class="st">&quot;region&quot;</span>,coefs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 6 7 8</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># to get all names that include &quot;region&quot;</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>coefs[<span class="fu">grep</span>(<span class="st">&quot;region&quot;</span>,coefs)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># to get all names that include &quot;region&quot;</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>coefs[<span class="fu">grep</span>(<span class="st">&quot;region&quot;</span>,coefs)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] &quot;as.factor(region)2&quot; &quot;as.factor(region)3&quot; &quot;as.factor(region)4&quot;</code></pre>
 </div>
 </div>
 <p>Using <code>grep</code> with <code>linearHypothesis</code> can allow you to test joint null hypothesis for all coefficients that include that expression. For example</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co">#  reg.4</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>coefs <span class="ot">&lt;-</span> <span class="fu">names</span>(<span class="fu">coef</span>(reg<span class="fl">.4</span>))</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co"># test null that region dummies all have 0 coefficients</span></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co"># and all interactions with region dummies have 0 coeffiicnets</span></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="fu">linearHypothesis</span>(reg<span class="fl">.4</span>, coefs[<span class="fu">grep</span>(<span class="st">&quot;region&quot;</span>, coefs)],<span class="at">test=</span><span class="st">&quot;Chisq&quot;</span>,<span class="at">vcov=</span>vcovHC)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co">#  reg.4</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>coefs <span class="ot">&lt;-</span> <span class="fu">names</span>(<span class="fu">coef</span>(reg<span class="fl">.4</span>))</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co"># test null that region dummies all have 0 coefficients</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="co"># and all interactions with region dummies have 0 coeffiicnets</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="fu">linearHypothesis</span>(reg<span class="fl">.4</span>, coefs[<span class="fu">grep</span>(<span class="st">&quot;region&quot;</span>, coefs)],<span class="at">test=</span><span class="st">&quot;Chisq&quot;</span>,<span class="at">vcov=</span>vcovHC)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Linear hypothesis test
 
@@ -3296,8 +3303,8 @@ Note: Coefficient covariance matrix supplied.
 ---
 Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># instead test all interactions in model have zero coefficients </span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">linearHypothesis</span>(reg<span class="fl">.4</span>, coefs[<span class="fu">grep</span>(<span class="st">&quot;:&quot;</span>, coefs)],<span class="at">test=</span><span class="st">&quot;Chisq&quot;</span>,<span class="at">vcov=</span>vcovHC)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># instead test all interactions in model have zero coefficients </span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">linearHypothesis</span>(reg<span class="fl">.4</span>, coefs[<span class="fu">grep</span>(<span class="st">&quot;:&quot;</span>, coefs)],<span class="at">test=</span><span class="st">&quot;Chisq&quot;</span>,<span class="at">vcov=</span>vcovHC)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Linear hypothesis test
 
@@ -3328,26 +3335,26 @@ Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&
 <p>Here I just demonstrate an example for the CPS wage regressions.</p>
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>regtest<span class="fl">.1</span> <span class="ot">&lt;-</span> <span class="fu">coeftest</span>(reg<span class="fl">.1</span>,<span class="at">vcov=</span>vcovHC)</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>regtest<span class="fl">.2</span> <span class="ot">&lt;-</span> <span class="fu">coeftest</span>(reg<span class="fl">.2</span>,<span class="at">vcov=</span>vcovHC)</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>regtest<span class="fl">.3</span> <span class="ot">&lt;-</span> <span class="fu">coeftest</span>(reg<span class="fl">.3</span>,<span class="at">vcov=</span>vcovHC)</span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>regtest<span class="fl">.4</span> <span class="ot">&lt;-</span> <span class="fu">coeftest</span>(reg<span class="fl">.4</span>,<span class="at">vcov=</span>vcovHC)</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="co"># here ^female$ is getting exact match for variable female for order.</span></span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="co"># following order is constant, exact match female, anything including</span></span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="co"># education, and then anything including exp</span></span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>vars.order<span class="ot">=</span><span class="fu">c</span>(<span class="st">&quot;Constant&quot;</span>,<span class="st">&quot;^female$&quot;</span>,<span class="st">&quot;education&quot;</span>,<span class="st">&quot;exp&quot;</span>)</span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>varlabels <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Intercept&quot;</span>, <span class="st">&quot;Female&quot;</span>, <span class="st">&quot;Education&quot;</span>, <span class="st">&quot;Female*Education&quot;</span>, <span class="st">&quot;Experience&quot;</span>, <span class="st">&quot;Experience-squared&quot;</span>,  <span class="st">&quot;Female*Experience&quot;</span>, <span class="st">&quot;Female*Experience-squared&quot;</span>)</span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a><span class="fu">stargazer</span>(reg<span class="fl">.1</span>, reg<span class="fl">.2</span>, reg<span class="fl">.3</span>, reg<span class="fl">.4</span>,<span class="at">dep.var.labels=</span><span class="st">&quot;Log(Wage)&quot;</span>,</span>
-<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>          <span class="at">report =</span> <span class="st">&quot;vc*sp&quot;</span>, <span class="at">omit=</span><span class="st">&quot;region&quot;</span>,</span>
-<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>          <span class="at">se=</span><span class="fu">list</span>(regtest<span class="fl">.1</span>[,<span class="dv">2</span>],regtest<span class="fl">.2</span>[,<span class="dv">2</span>],regtest<span class="fl">.3</span>[,<span class="dv">2</span>],regtest<span class="fl">.4</span>[,<span class="dv">2</span>]),</span>
-<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>          <span class="at">p=</span><span class="fu">list</span>(regtest<span class="fl">.1</span>[,<span class="dv">4</span>],regtest<span class="fl">.2</span>[,<span class="dv">4</span>],regtest<span class="fl">.3</span>[,<span class="dv">4</span>],regtest<span class="fl">.4</span>[,<span class="dv">4</span>]),</span>
-<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>          <span class="at">type=</span><span class="st">&quot;html&quot;</span>, <span class="at">style=</span><span class="st">&quot;aer&quot;</span>,    <span class="at">intercept.bottom =</span> <span class="cn">FALSE</span>, <span class="at">order=</span>vars.order,</span>
-<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>           <span class="at">add.lines =</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">&quot;Region Dummies?&quot;</span>, <span class="st">&quot;No&quot;</span>, <span class="st">&quot;No&quot;</span>, <span class="st">&quot;No&quot;</span>, <span class="st">&quot;Yes&quot;</span>)),</span>
-<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>          <span class="at">covariate.labels=</span>varlabels, </span>
-<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>          <span class="at">omit.stat=</span><span class="fu">c</span>(<span class="st">&quot;LL&quot;</span>,<span class="st">&quot;ser&quot;</span>,<span class="st">&quot;f&quot;</span>,<span class="st">&quot;adj.rsq&quot;</span>), <span class="at">notes.append =</span> <span class="cn">FALSE</span> , <span class="at">notes.align =</span> <span class="st">&quot;l&quot;</span>, </span>
-<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a>          <span class="at">notes =</span> <span class="st">&quot;Data from CPS March 2009 survey, including full-time workers between the ages of eighteen and sixty-five. Reporting heteroscedastic-robust standard errors in parentheses.  Reported p-values are based on these heteroscedastic-robust standard errors.&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>regtest<span class="fl">.1</span> <span class="ot">&lt;-</span> <span class="fu">coeftest</span>(reg<span class="fl">.1</span>,<span class="at">vcov=</span>vcovHC)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>regtest<span class="fl">.2</span> <span class="ot">&lt;-</span> <span class="fu">coeftest</span>(reg<span class="fl">.2</span>,<span class="at">vcov=</span>vcovHC)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>regtest<span class="fl">.3</span> <span class="ot">&lt;-</span> <span class="fu">coeftest</span>(reg<span class="fl">.3</span>,<span class="at">vcov=</span>vcovHC)</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>regtest<span class="fl">.4</span> <span class="ot">&lt;-</span> <span class="fu">coeftest</span>(reg<span class="fl">.4</span>,<span class="at">vcov=</span>vcovHC)</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="co"># here ^female$ is getting exact match for variable female for order.</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="co"># following order is constant, exact match female, anything including</span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="co"># education, and then anything including exp</span></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>vars.order<span class="ot">=</span><span class="fu">c</span>(<span class="st">&quot;Constant&quot;</span>,<span class="st">&quot;^female$&quot;</span>,<span class="st">&quot;education&quot;</span>,<span class="st">&quot;exp&quot;</span>)</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>varlabels <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Intercept&quot;</span>, <span class="st">&quot;Female&quot;</span>, <span class="st">&quot;Education&quot;</span>, <span class="st">&quot;Female*Education&quot;</span>, <span class="st">&quot;Experience&quot;</span>, <span class="st">&quot;Experience-squared&quot;</span>,  <span class="st">&quot;Female*Experience&quot;</span>, <span class="st">&quot;Female*Experience-squared&quot;</span>)</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a><span class="fu">stargazer</span>(reg<span class="fl">.1</span>, reg<span class="fl">.2</span>, reg<span class="fl">.3</span>, reg<span class="fl">.4</span>,<span class="at">dep.var.labels=</span><span class="st">&quot;Log(Wage)&quot;</span>,</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>          <span class="at">report =</span> <span class="st">&quot;vc*sp&quot;</span>, <span class="at">omit=</span><span class="st">&quot;region&quot;</span>,</span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>          <span class="at">se=</span><span class="fu">list</span>(regtest<span class="fl">.1</span>[,<span class="dv">2</span>],regtest<span class="fl">.2</span>[,<span class="dv">2</span>],regtest<span class="fl">.3</span>[,<span class="dv">2</span>],regtest<span class="fl">.4</span>[,<span class="dv">2</span>]),</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>          <span class="at">p=</span><span class="fu">list</span>(regtest<span class="fl">.1</span>[,<span class="dv">4</span>],regtest<span class="fl">.2</span>[,<span class="dv">4</span>],regtest<span class="fl">.3</span>[,<span class="dv">4</span>],regtest<span class="fl">.4</span>[,<span class="dv">4</span>]),</span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>          <span class="at">type=</span><span class="st">&quot;html&quot;</span>, <span class="at">style=</span><span class="st">&quot;aer&quot;</span>,    <span class="at">intercept.bottom =</span> <span class="cn">FALSE</span>, <span class="at">order=</span>vars.order,</span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>           <span class="at">add.lines =</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">&quot;Region Dummies?&quot;</span>, <span class="st">&quot;No&quot;</span>, <span class="st">&quot;No&quot;</span>, <span class="st">&quot;No&quot;</span>, <span class="st">&quot;Yes&quot;</span>)),</span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>          <span class="at">covariate.labels=</span>varlabels, </span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>          <span class="at">omit.stat=</span><span class="fu">c</span>(<span class="st">&quot;LL&quot;</span>,<span class="st">&quot;ser&quot;</span>,<span class="st">&quot;f&quot;</span>,<span class="st">&quot;adj.rsq&quot;</span>), <span class="at">notes.append =</span> <span class="cn">FALSE</span> , <span class="at">notes.align =</span> <span class="st">&quot;l&quot;</span>, </span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>          <span class="at">notes =</span> <span class="st">&quot;Data from CPS March 2009 survey, including full-time workers between the ages of eighteen and sixty-five. Reporting heteroscedastic-robust standard errors in parentheses.  Reported p-values are based on these heteroscedastic-robust standard errors.&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 
 <table style="text-align:center">
@@ -4105,224 +4112,225 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class>
-<div class="sourceCode" id="cb23" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> &quot;Implementing OLS in R&quot;</span></span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="an">author:</span><span class="co"> &quot;Edward Vytlacil&quot;</span></span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="an">date:</span><span class="co"> &quot;June 22, 2022&quot;</span></span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="an">toc:</span><span class="co"> true</span></span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span></span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="co">   html:</span></span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="co">    html-math-method: katex</span></span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a><span class="co">    code-tools: true</span></span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a><span class="co">    self-contained: true</span></span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a><span class="an">execute:</span></span>
-<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a><span class="co">  warning: false</span></span>
-<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a><span class="an">reference-location:</span><span class="co"> margin</span></span>
-<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a><span class="an">citation-location:</span><span class="co"> margin</span></span>
-<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a><span class="an">bibliography:</span><span class="co"> handouts.bib</span></span>
-<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a><span class="fu">## Load Libraries</span></span>
-<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>In **R**, we will typically implement linear regression in three stages: use base-**R** function <span class="in">`lm`</span> to fit the model by OLS; use function <span class="in">`vcovHC`</span> from package <span class="in">`lmtest`</span> and function <span class="in">`coeftest`</span> from package <span class="in">`lmtest`</span> to construct heteroscedastic-robust s.e. and perform inference; and finally feed those results into <span class="in">`stargazer`</span> to create a table of regression results that includes heteroscedastic s.e. and appropriate inference results.</span>
-<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>Additionally, the package <span class="in">`car`</span> has useful functions for regression, including the function <span class="in">`linearHypothesis`</span> for implementing Wald tests of joint null hypotheses.</span>
-<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
-<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a>flowchart LR</span>
-<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a>  A[lm &lt;br&gt; run regression] --&gt; B(confint, vcov=vcovHC &lt;br&gt; robust CI )</span>
-<span id="cb23-27"><a href="#cb23-27" aria-hidden="true" tabindex="-1"></a>  A--&gt; C(coeftest, vcov=vcovHC &lt;br&gt; robust p-<span class="fu">values</span>, <span class="ot">s.e.</span><span class="st">)</span></span>
-<span id="cb23-28"><a href="#cb23-28" aria-hidden="true" tabindex="-1"></a><span class="st">  A--&gt; D(linearHypothesis, vcov=vcovHC &lt;br&gt; robust Wald-test)</span></span>
-<span id="cb23-29"><a href="#cb23-29" aria-hidden="true" tabindex="-1"></a><span class="st">  B--&gt; E{Stargazer &lt;br&gt; regression table}</span></span>
-<span id="cb23-30"><a href="#cb23-30" aria-hidden="true" tabindex="-1"></a><span class="st">  C--&gt; E</span></span>
-<span id="cb23-31"><a href="#cb23-31" aria-hidden="true" tabindex="-1"></a><span class="st">  D--&gt; E</span></span>
-<span id="cb23-32"><a href="#cb23-32" aria-hidden="true" tabindex="-1"></a><span class="st">```</span></span>
-<span id="cb23-33"><a href="#cb23-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-34"><a href="#cb23-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-35"><a href="#cb23-35" aria-hidden="true" tabindex="-1"></a><span class="st">| Library     | Purpose                                                                    |</span></span>
-<span id="cb23-36"><a href="#cb23-36" aria-hidden="true" tabindex="-1"></a><span class="st">|-----------------------------|-------------------------------------------|</span></span>
-<span id="cb23-37"><a href="#cb23-37" aria-hidden="true" tabindex="-1"></a><span class="st">| `sandwich`  | package by </span><span class="dt">@zeileis2006object</span><span class="st"> for robust variance estimation, including for linear regression models</span><span class="ot">.</span> The reference manual is [here](https://cran.r<span class="ot">-p</span>roject.org/web/packages/sandwich/sandwich.pdf). Below we will <span class="fu">use</span> function <span class="ot">`</span><span class="st">vcovHC</span><span class="ot">`</span> <span class="kw">for</span> heteroscedastic<span class="ot">-r</span>obust variance estimation. |</span>
-<span id="cb23-38"><a href="#cb23-38" aria-hidden="true" tabindex="-1"></a>| <span class="ot">`</span><span class="st">lmtest</span><span class="ot">`</span>    | <span class="kw">package</span> by <span class="dt">@hothorn2015package</span> provides various functions <span class="kw">for</span> inference. Below we will <span class="fu">use</span> the function <span class="ot">`</span><span class="st">coeftest</span><span class="ot">`</span> <span class="kw">for</span> inference <span class="ot">and</span> <span class="ot">`</span><span class="st">confint</span><span class="ot">`</span> <span class="kw">for</span> confidence intervals.                                                                                                                 |</span>
-<span id="cb23-39"><a href="#cb23-39" aria-hidden="true" tabindex="-1"></a>| <span class="ot">`</span><span class="st">car</span><span class="ot">`</span>       | <span class="kw">package</span> by <span class="dt">@fox2012package</span> provides functions <span class="kw">for</span> regression analysis. Below we will <span class="fu">use</span> the function <span class="ot">`</span><span class="st">linearhypothesis</span><span class="ot">`</span> to implement Wald tests of joint null hypotheses.                                                                                                               |</span>
-<span id="cb23-40"><a href="#cb23-40" aria-hidden="true" tabindex="-1"></a>| <span class="ot">`</span><span class="st">stargazer</span><span class="ot">`</span> | <span class="kw">package</span> by <span class="dt">@hlavac2022stargazer</span> <span class="kw">for</span> creating tables. Creates publication<span class="ot">-r</span>eady tables that are especially well<span class="ot">-s</span>uited <span class="kw">for</span> reporting regression results in the standard <span class="fu">format</span> <span class="kw">for</span> academic papers in economics <span class="ot">and</span> other social sciences.                                                |</span>
-<span id="cb23-41"><a href="#cb23-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-42"><a href="#cb23-42" aria-hidden="true" tabindex="-1"></a>In addition, <span class="kw">for</span> this particular handout, we will <span class="fu">use</span> one more <span class="kw">package</span>: <span class="ot">`</span><span class="st">haven</span><span class="ot">`</span> to <span class="fu">read</span> in STATA .dta data sets into *<span class="dt">*R</span>*<span class="wa">*.</span></span>
-<span id="cb23-43"><a href="#cb23-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-46"><a href="#cb23-46" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb23-47"><a href="#cb23-47" aria-hidden="true" tabindex="-1"></a><span class="st">#| label: load-packages-1</span></span>
-<span id="cb23-48"><a href="#cb23-48" aria-hidden="true" tabindex="-1"></a><span class="st">#| echo: true</span></span>
-<span id="cb23-49"><a href="#cb23-49" aria-hidden="true" tabindex="-1"></a><span class="st">#| code-fold: true</span></span>
-<span id="cb23-50"><a href="#cb23-50" aria-hidden="true" tabindex="-1"></a><span class="st"># install packages using install.packages( )  if not already installed  </span></span>
-<span id="cb23-51"><a href="#cb23-51" aria-hidden="true" tabindex="-1"></a><span class="st">library(sandwich)</span></span>
-<span id="cb23-52"><a href="#cb23-52" aria-hidden="true" tabindex="-1"></a><span class="st">library(lmtest)</span></span>
-<span id="cb23-53"><a href="#cb23-53" aria-hidden="true" tabindex="-1"></a><span class="st">library(car)</span></span>
-<span id="cb23-54"><a href="#cb23-54" aria-hidden="true" tabindex="-1"></a><span class="st">library(stargazer)</span></span>
-<span id="cb23-55"><a href="#cb23-55" aria-hidden="true" tabindex="-1"></a><span class="st">library(haven)</span></span>
-<span id="cb23-56"><a href="#cb23-56" aria-hidden="true" tabindex="-1"></a><span class="ot">```</span></span>
-<span id="cb23-57"><a href="#cb23-57" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-58"><a href="#cb23-58" aria-hidden="true" tabindex="-1"></a><span class="co">## Data for this handout</span></span>
-<span id="cb23-59"><a href="#cb23-59" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-60"><a href="#cb23-60" aria-hidden="true" tabindex="-1"></a>In this handout, we will illustrate linear regression using the CPS data set posted on [Bruce Hansen<span class="ot">&#39;</span><span class="ss">s website](https://www.ssc.wisc.edu/~bhansen/econometrics/) to accompany his textbook. The data set is posted in a zip file that can be downloaded [here](https://www.ssc.wisc.edu/~bhansen/econometrics/Econometrics%20Data.zip). We will read in the STATA .dta formatted versions of the data set. I have also posted the data set and its documentation to my personal webpage (linked below).</span></span>
-<span id="cb23-61"><a href="#cb23-61" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-62"><a href="#cb23-62" aria-hidden="true" tabindex="-1"></a><span class="ss">| Data File                                                                  | Documentation                                                                                      | Description                                                              |</span></span>
-<span id="cb23-63"><a href="#cb23-63" aria-hidden="true" tabindex="-1"></a><span class="ss">|-------------------|---------------------------|---------------------------|</span></span>
-<span id="cb23-64"><a href="#cb23-64" aria-hidden="true" tabindex="-1"></a><span class="ss">| cps09mar.dta ([link](https://edward-vytlacil.github.io/Data/cps09mar.dta)) | cps09mar_description.pdf ([link](https://edward-vytlacil.github.io/Data/cps09mar_description.pdf)) | Subset of March 2009 CPS that is relevant for estimating wage equations. |</span></span>
-<span id="cb23-65"><a href="#cb23-65" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-66"><a href="#cb23-66" aria-hidden="true" tabindex="-1"></a><span class="ss">## `lm` and Model Syntax</span></span>
-<span id="cb23-67"><a href="#cb23-67" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-68"><a href="#cb23-68" aria-hidden="true" tabindex="-1"></a><span class="ss">We implement OLS regression with the **R** function `lm` with the syntax `lm(y~model, data=df)` where `y` is the left-hand side variable (i.e., regressand) for the regression model, `model` is a specification of the right hand side of the regression model, and `df` is the data.frame. Here are some examples: [See `?formula` for information on what model formulas are allowed.]{.aside}</span></span>
-<span id="cb23-69"><a href="#cb23-69" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-70"><a href="#cb23-70" aria-hidden="true" tabindex="-1"></a><span class="ss">::: column-page</span></span>
-<span id="cb23-71"><a href="#cb23-71" aria-hidden="true" tabindex="-1"></a><span class="ss">| R syntax                      | Model fit                                                                                                                                                                                | Notes                                                                                                                           |</span></span>
-<span id="cb23-72"><a href="#cb23-72" aria-hidden="true" tabindex="-1"></a><span class="ss">|--------------------|:--------------------------------|-------------------|</span></span>
-<span id="cb23-73"><a href="#cb23-73" aria-hidden="true" tabindex="-1"></a><span class="ss">| `y~x`                         | $y_i = \beta_0 + \beta_1 x_i +\epsilon_i$                                                                                                                                                |                                                                                                                                 |</span></span>
-<span id="cb23-74"><a href="#cb23-74" aria-hidden="true" tabindex="-1"></a><span class="ss">| `y~x+w`                       | $y = \beta_0 + \beta_1 x_i+ \beta_2 w_i +\epsilon_i$                                                                                                                                     |                                                                                                                                 |</span></span>
-<span id="cb23-75"><a href="#cb23-75" aria-hidden="true" tabindex="-1"></a><span class="ss">| `y~x+w+x:w`                   | $y_i = \beta_0 + \beta_1 x_i + \beta_2 w_i + \beta_3 (x_i \cdot w_i) + \epsilon_i$                                                                                                       | `x:w` is interaction term                                                                                                       |</span></span>
-<span id="cb23-76"><a href="#cb23-76" aria-hidden="true" tabindex="-1"></a><span class="ss">| `y~x*w`                       | $y_i = \beta_0 + \beta_1 x_i + \beta_2 w_i + \beta_3 (x_i \cdot w_i) + \epsilon_i$                                                                                                       | `x*w` includes x, w, and x:w                                                                                                    |</span></span>
-<span id="cb23-77"><a href="#cb23-77" aria-hidden="true" tabindex="-1"></a><span class="ss">| `y~x*w-x`                     | $y_i = \beta_0 + \beta_1 w_i + \beta_2 (x_i \cdot w_i) + \epsilon_i$                                                                                                                     | `-x` removes variable `x`                                                                                                       |</span></span>
-<span id="cb23-78"><a href="#cb23-78" aria-hidden="true" tabindex="-1"></a><span class="ss">| `y~x*(w+z)`                   | $y_i = \beta_0 + \beta_1 x_i + \beta_2 w_i + \beta_3 z_i + \beta_4 (x_i \cdot w_i) + \beta_5 (x_i \cdot z_i) + \epsilon_i$                                                               | `x*(w+z)` includes x, w, z, x:w, and x:z                                                                                        |</span></span>
-<span id="cb23-79"><a href="#cb23-79" aria-hidden="true" tabindex="-1"></a><span class="ss">| `y~(x+w+z)^2`                 | $y_i = \beta_0 + \beta_1 x_i + \beta_2 w_i + \beta_3 z_i + \beta_4 (x_i \cdot w_i) + \beta_5 (x_i \cdot z_i) + \beta_6 (w_i \cdot z_i) + \epsilon_i$                                     | `(x+w+z)^2` includes all main effects and all second-order interactions.                                                        |</span></span>
-<span id="cb23-80"><a href="#cb23-80" aria-hidden="true" tabindex="-1"></a><span class="ss">| `y~x*w*z`                     | $y_i = \beta_0 + \beta_1 x_i + \beta_2 w_i + \beta_3 z_i + \beta_4 (x_i \cdot w_i) + \beta_5 (x_i \cdot z_i) + \beta_6 (w_i \cdot z_i) + \beta_7 (x_i \cdot w_i \cdot z_i) + \epsilon_i$ | `x*w*z` includes all main effects, second-order interactions and third order interaction.                                       |</span></span>
-<span id="cb23-81"><a href="#cb23-81" aria-hidden="true" tabindex="-1"></a><span class="ss">| `I(ln(y))~x`                  | $\ln(y_i) = \beta_0 + \beta_1 x_i +\epsilon_i$                                                                                                                                           | `I( )` allows you create a new variable for regression.                                                                         |</span></span>
-<span id="cb23-82"><a href="#cb23-82" aria-hidden="true" tabindex="-1"></a><span class="ss">| `y~x+I(x^2)`                  | $y_i = \beta_0 + \beta_1 x_i + \beta_2 x_i^2 +\epsilon_i$                                                                                                                                |                                                                                                                                 |</span></span>
-<span id="cb23-83"><a href="#cb23-83" aria-hidden="true" tabindex="-1"></a><span class="ss">| `y~poly(x,degree=2,raw=TRUE)` | $y_i = \beta_0 + \beta_1 x_i + \beta_2 x_i^2 +\epsilon_i$                                                                                                                                | `poly(x,degree=k,raw=TRUE)` includes a k order polynomial in x. `raw=FALSE` would include a k order orthogonal polynomial in x. |</span></span>
-<span id="cb23-84"><a href="#cb23-84" aria-hidden="true" tabindex="-1"></a><span class="ss">| `y~x+as.factor(w)`            | $y_i = \beta_0 + \beta_1 x_i + \sum_{l=1}^L \beta_{1+l} 1\{w_i=w_l\} \  +\epsilon_i$                                                                                                     | For discrete `w`, `as.factor(w)` includes a dummy variable for each value of `w`.                                               |</span></span>
-<span id="cb23-85"><a href="#cb23-85" aria-hidden="true" tabindex="-1"></a><span class="ss">:::</span></span>
-<span id="cb23-86"><a href="#cb23-86" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-87"><a href="#cb23-87" aria-hidden="true" tabindex="-1"></a><span class="ss">For example, consider following regressions using the CPS data:</span></span>
-<span id="cb23-88"><a href="#cb23-88" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-91"><a href="#cb23-91" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb23-92"><a href="#cb23-92" aria-hidden="true" tabindex="-1"></a><span class="ss"># read in data set (from STATA .dta format)</span></span>
-<span id="cb23-93"><a href="#cb23-93" aria-hidden="true" tabindex="-1"></a><span class="ss">df.CPS &lt;- read_dta(&quot;/Users/ev6/Documents/GitHub/edward-vytlacil.github.io/Data/cps09mar.dta&quot;)</span></span>
-<span id="cb23-94"><a href="#cb23-94" aria-hidden="true" tabindex="-1"></a><span class="ss">#construct log wage variable for CPS</span></span>
-<span id="cb23-95"><a href="#cb23-95" aria-hidden="true" tabindex="-1"></a><span class="ss">df.CPS$logwage &lt;- with(df.CPS,log(earnings/hours)) </span></span>
-<span id="cb23-96"><a href="#cb23-96" aria-hidden="true" tabindex="-1"></a><span class="ss">#construct experience proxy variable for CPS</span></span>
-<span id="cb23-97"><a href="#cb23-97" aria-hidden="true" tabindex="-1"></a><span class="ss">df.CPS$exp &lt;- with(df.CPS,age - education-6) </span></span>
-<span id="cb23-98"><a href="#cb23-98" aria-hidden="true" tabindex="-1"></a><span class="ss">#restrict sample to ages 18 to 65</span></span>
-<span id="cb23-99"><a href="#cb23-99" aria-hidden="true" tabindex="-1"></a><span class="ss">df.CPS &lt;- df.CPS[df.CPS$age&gt;=18 &amp; df.CPS$age&lt;=65, ]</span></span>
-<span id="cb23-100"><a href="#cb23-100" aria-hidden="true" tabindex="-1"></a><span class="ss"># regress log wage on education and quadratic in experience</span></span>
-<span id="cb23-101"><a href="#cb23-101" aria-hidden="true" tabindex="-1"></a><span class="ss">reg.1 &lt;- lm(logwage ~ education + exp + I(exp^2),data=df.CPS)</span></span>
-<span id="cb23-102"><a href="#cb23-102" aria-hidden="true" tabindex="-1"></a><span class="ss"># as above, but add female dummy</span></span>
-<span id="cb23-103"><a href="#cb23-103" aria-hidden="true" tabindex="-1"></a><span class="ss">reg.2 &lt;- lm(logwage ~ education + exp + I(exp^2) + female,data=df.CPS)</span></span>
-<span id="cb23-104"><a href="#cb23-104" aria-hidden="true" tabindex="-1"></a><span class="ss"># as above, but interact education and exp with female dummy</span></span>
-<span id="cb23-105"><a href="#cb23-105" aria-hidden="true" tabindex="-1"></a><span class="ss">reg.3 &lt;- lm(logwage ~ female*(education + exp + I(exp^2)),data=df.CPS)</span></span>
-<span id="cb23-106"><a href="#cb23-106" aria-hidden="true" tabindex="-1"></a><span class="ss"># as above, but add dummy variables (fixed effects) for each region</span></span>
-<span id="cb23-107"><a href="#cb23-107" aria-hidden="true" tabindex="-1"></a><span class="ss">reg.4 &lt;- lm(logwage ~ female*(education + exp + I(exp^2))+</span></span>
-<span id="cb23-108"><a href="#cb23-108" aria-hidden="true" tabindex="-1"></a><span class="ss">                                as.factor(region),data=df.CPS)</span></span>
-<span id="cb23-109"><a href="#cb23-109" aria-hidden="true" tabindex="-1"></a><span class="ss">```</span></span>
-<span id="cb23-110"><a href="#cb23-110" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-111"><a href="#cb23-111" aria-hidden="true" tabindex="-1"></a><span class="ss">::: {.callout-note collapse=&quot;true&quot;}</span></span>
-<span id="cb23-112"><a href="#cb23-112" aria-hidden="true" tabindex="-1"></a><span class="ss"># Update Function</span></span>
-<span id="cb23-113"><a href="#cb23-113" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-114"><a href="#cb23-114" aria-hidden="true" tabindex="-1"></a><span class="ss">The `update` function allows you to modify a previously saved regression specification. For example:</span></span>
-<span id="cb23-115"><a href="#cb23-115" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-118"><a href="#cb23-118" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb23-119"><a href="#cb23-119" aria-hidden="true" tabindex="-1"></a><span class="ss">#| eval: false</span></span>
-<span id="cb23-120"><a href="#cb23-120" aria-hidden="true" tabindex="-1"></a><span class="ss">reg.1 &lt;- lm(logwage ~ education + exp + I(exp^2),data=df.CPS)</span></span>
-<span id="cb23-121"><a href="#cb23-121" aria-hidden="true" tabindex="-1"></a><span class="ss"># update reg.1 to add female dummy</span></span>
-<span id="cb23-122"><a href="#cb23-122" aria-hidden="true" tabindex="-1"></a><span class="ss">reg.2 &lt;- update(reg.1, .~.+female)</span></span>
-<span id="cb23-123"><a href="#cb23-123" aria-hidden="true" tabindex="-1"></a><span class="ss"># update reg.1 to add female dummy and interactions with female</span></span>
-<span id="cb23-124"><a href="#cb23-124" aria-hidden="true" tabindex="-1"></a><span class="ss">reg.3 &lt;- update(reg.1, .~.*female)</span></span>
-<span id="cb23-125"><a href="#cb23-125" aria-hidden="true" tabindex="-1"></a><span class="ss"># update reg.3 to  add dummy variables (fixed effects) for each region</span></span>
-<span id="cb23-126"><a href="#cb23-126" aria-hidden="true" tabindex="-1"></a><span class="ss">reg.4 &lt;-  update(reg.3, .~. +as.factor(region))</span></span>
-<span id="cb23-127"><a href="#cb23-127" aria-hidden="true" tabindex="-1"></a><span class="ss">```</span></span>
-<span id="cb23-128"><a href="#cb23-128" aria-hidden="true" tabindex="-1"></a><span class="ss">:::</span></span>
-<span id="cb23-129"><a href="#cb23-129" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-130"><a href="#cb23-130" aria-hidden="true" tabindex="-1"></a><span class="ss">::: {.callout-note collapse=&quot;true&quot;}</span></span>
-<span id="cb23-131"><a href="#cb23-131" aria-hidden="true" tabindex="-1"></a><span class="ss"># Subset of data for `lm`</span></span>
-<span id="cb23-132"><a href="#cb23-132" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-133"><a href="#cb23-133" aria-hidden="true" tabindex="-1"></a><span class="ss">You can optionally use the `subset` option in `lm` to only use a subset of the data for the regression. For example, `lm(logwage ~ education + exp + I(exp^2),data=df.CPS,subset=female==1)` only uses the `female==1` observations. Alternatively, if `reg.1` is the saved regression on the full sample, `update(reg.1, subset=female==1)` is a new regression model only using the `female==1` observations.</span></span>
-<span id="cb23-134"><a href="#cb23-134" aria-hidden="true" tabindex="-1"></a><span class="ss">:::</span></span>
-<span id="cb23-135"><a href="#cb23-135" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-136"><a href="#cb23-136" aria-hidden="true" tabindex="-1"></a><span class="ss">## `lm` and Model Output</span></span>
-<span id="cb23-137"><a href="#cb23-137" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-138"><a href="#cb23-138" aria-hidden="true" tabindex="-1"></a><span class="ss">Consider the code `reg.1 &lt;- lm(logwage ~ education + exp + I(exp^2),data=df.CPS)` The resulting object `reg.1` contains the results from the regression. It is particularly convenient to use the `summary`function to access the results.[See `?summary.lm` for more details.]{.aside} For example:</span></span>
-<span id="cb23-139"><a href="#cb23-139" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-142"><a href="#cb23-142" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb23-143"><a href="#cb23-143" aria-hidden="true" tabindex="-1"></a><span class="ss">summary(reg.1)</span></span>
-<span id="cb23-144"><a href="#cb23-144" aria-hidden="true" tabindex="-1"></a><span class="ss">```</span></span>
-<span id="cb23-145"><a href="#cb23-145" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-146"><a href="#cb23-146" aria-hidden="true" tabindex="-1"></a><span class="ss">It is important to note that the default standard errors (and thus the default t-statistics and p-values) from the `lm` function are only valid under homoscedasticity. We will return to using heteroscedastic-robust standard errors later in this handout.</span></span>
-<span id="cb23-147"><a href="#cb23-147" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-148"><a href="#cb23-148" aria-hidden="true" tabindex="-1"></a><span class="ss">You can further extract results from the saved regression object. For example, `summary(reg.1)$coefficients` returns a matrix with estimated coefficients in first column, standard errors in second column, and t-statistics in third column (with s.e. and t-statistics based on non-robust variance estimation), while `summary(reg.1)$residuals` extracts the OLS residuals. The functions `coef`, `residuals` and `fitted` can also be applied to the saved regression object, for example, `coef(reg.1)` returns the estimated coefficients, while `coef(summary(reg.1))` returns a matrix of estimated coefficients, standard errors, and t-statistics, same as `summary(reg.1)$coefficients`. As another example, `residuals(reg.1)`, `residuals(summary(reg.1))`, `reg.1$residuals` and `summary(reg.1)$residuals` all return the sample residuals.</span></span>
-<span id="cb23-149"><a href="#cb23-149" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-150"><a href="#cb23-150" aria-hidden="true" tabindex="-1"></a><span class="ss">## Heteroscedastic Robust Inference</span></span>
-<span id="cb23-151"><a href="#cb23-151" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-152"><a href="#cb23-152" aria-hidden="true" tabindex="-1"></a><span class="ss">As previously mentioned, `lm`  returns standard errors (and thus t-statistics and p-values) based on  non-robust variance estimation. To obtain results based on heteroscedastic robust variance estimation, we typically use `vcovHC` from package `sandwich`.[It is also common to use `vcovCL` from the `sandwich` package in case of clustered data.]{.aside} [`vcovHC` by default is using the HC3 heteroscedastic robust variance estimator, though other heteroscedastic robust variance estimators can be chosen. See @zeileis2004econometric]{.aside} For example:</span></span>
-<span id="cb23-153"><a href="#cb23-153" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-156"><a href="#cb23-156" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb23-157"><a href="#cb23-157" aria-hidden="true" tabindex="-1"></a><span class="ss"># heteroscedastic-robust variance estimate (HC3) for reg.1</span></span>
-<span id="cb23-158"><a href="#cb23-158" aria-hidden="true" tabindex="-1"></a><span class="ss">vcovHC(reg.1)</span></span>
-<span id="cb23-159"><a href="#cb23-159" aria-hidden="true" tabindex="-1"></a><span class="ss">```</span></span>
-<span id="cb23-160"><a href="#cb23-160" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-161"><a href="#cb23-161" aria-hidden="true" tabindex="-1"></a><span class="ss">Other useful functions include `coeftest` and `confint` from package `lmtest` for inference and confidence intervals using a specified estimator for the variance of the OLS coefficients, for example, using `vcovHC`. Likewise, the function `linearHypotheis` from package `car` can be used for Wald tests of joint nulls, where one can again specify that the test use using a specified estimator for the variance of the OLS coefficients, for example, `vcovHC`. For example:</span></span>
-<span id="cb23-162"><a href="#cb23-162" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-165"><a href="#cb23-165" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb23-166"><a href="#cb23-166" aria-hidden="true" tabindex="-1"></a><span class="ss"># s.e., t-statistics, and p-values using robust variance estimate</span></span>
-<span id="cb23-167"><a href="#cb23-167" aria-hidden="true" tabindex="-1"></a><span class="ss">coeftest(reg.1,vcov=vcovHC)</span></span>
-<span id="cb23-168"><a href="#cb23-168" aria-hidden="true" tabindex="-1"></a><span class="ss"># corresponding CIs</span></span>
-<span id="cb23-169"><a href="#cb23-169" aria-hidden="true" tabindex="-1"></a><span class="ss">confint(reg.1,level=0.95,vcov=vcovHC)</span></span>
-<span id="cb23-170"><a href="#cb23-170" aria-hidden="true" tabindex="-1"></a><span class="ss"># testing joint null that coefficient on exp=0 and coeff on exp^2=0</span></span>
-<span id="cb23-171"><a href="#cb23-171" aria-hidden="true" tabindex="-1"></a><span class="ss">linearHypothesis(reg.2,c(&quot;exp=0&quot;,&quot;I(exp^2)=0&quot;),test=&quot;Chisq&quot;,vcov=vcovHC)</span></span>
-<span id="cb23-172"><a href="#cb23-172" aria-hidden="true" tabindex="-1"></a><span class="ss">```</span></span>
-<span id="cb23-173"><a href="#cb23-173" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-174"><a href="#cb23-174" aria-hidden="true" tabindex="-1"></a><span class="ss">::: {.callout-note collapse=&quot;true&quot;}</span></span>
-<span id="cb23-175"><a href="#cb23-175" aria-hidden="true" tabindex="-1"></a><span class="ss"># Grep Function</span></span>
-<span id="cb23-176"><a href="#cb23-176" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-177"><a href="#cb23-177" aria-hidden="true" tabindex="-1"></a><span class="ss">The UNIX command `grep` is implemented as a function in **R**. The function allows you to search text for all lines that match the desired expression. For example</span></span>
-<span id="cb23-178"><a href="#cb23-178" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-181"><a href="#cb23-181" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb23-182"><a href="#cb23-182" aria-hidden="true" tabindex="-1"></a><span class="ss"># covariate names from reg.4</span></span>
-<span id="cb23-183"><a href="#cb23-183" aria-hidden="true" tabindex="-1"></a><span class="ss">coefs &lt;- names(coef(reg.4))</span></span>
-<span id="cb23-184"><a href="#cb23-184" aria-hidden="true" tabindex="-1"></a><span class="ss"># search names that include expression &quot;region&quot;</span></span>
-<span id="cb23-185"><a href="#cb23-185" aria-hidden="true" tabindex="-1"></a><span class="ss"># grep returns indices that include expressiom</span></span>
-<span id="cb23-186"><a href="#cb23-186" aria-hidden="true" tabindex="-1"></a><span class="ss">grep(&quot;region&quot;,coefs)</span></span>
-<span id="cb23-187"><a href="#cb23-187" aria-hidden="true" tabindex="-1"></a><span class="ss"># to get all names that include &quot;region&quot;</span></span>
-<span id="cb23-188"><a href="#cb23-188" aria-hidden="true" tabindex="-1"></a><span class="ss">coefs[grep(&quot;region&quot;,coefs)]</span></span>
-<span id="cb23-189"><a href="#cb23-189" aria-hidden="true" tabindex="-1"></a><span class="ss">```</span></span>
-<span id="cb23-190"><a href="#cb23-190" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-191"><a href="#cb23-191" aria-hidden="true" tabindex="-1"></a><span class="ss">Using `grep` with `linearHypothesis` can allow you to test joint null hypothesis for all coefficients that include that expression. For example</span></span>
-<span id="cb23-192"><a href="#cb23-192" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-195"><a href="#cb23-195" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb23-196"><a href="#cb23-196" aria-hidden="true" tabindex="-1"></a><span class="ss">#  reg.4</span></span>
-<span id="cb23-197"><a href="#cb23-197" aria-hidden="true" tabindex="-1"></a><span class="ss">coefs &lt;- names(coef(reg.4))</span></span>
-<span id="cb23-198"><a href="#cb23-198" aria-hidden="true" tabindex="-1"></a><span class="ss"># test null that region dummies all have 0 coefficients</span></span>
-<span id="cb23-199"><a href="#cb23-199" aria-hidden="true" tabindex="-1"></a><span class="ss"># and all interactions with region dummies have 0 coeffiicnets</span></span>
-<span id="cb23-200"><a href="#cb23-200" aria-hidden="true" tabindex="-1"></a><span class="ss">linearHypothesis(reg.4, coefs[grep(&quot;region&quot;, coefs)],test=&quot;Chisq&quot;,vcov=vcovHC)</span></span>
-<span id="cb23-201"><a href="#cb23-201" aria-hidden="true" tabindex="-1"></a><span class="ss"># instead test all interactions in model have zero coefficients </span></span>
-<span id="cb23-202"><a href="#cb23-202" aria-hidden="true" tabindex="-1"></a><span class="ss">linearHypothesis(reg.4, coefs[grep(&quot;:&quot;, coefs)],test=&quot;Chisq&quot;,vcov=vcovHC)</span></span>
-<span id="cb23-203"><a href="#cb23-203" aria-hidden="true" tabindex="-1"></a><span class="ss">```</span></span>
-<span id="cb23-204"><a href="#cb23-204" aria-hidden="true" tabindex="-1"></a><span class="ss">:::</span></span>
-<span id="cb23-205"><a href="#cb23-205" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-206"><a href="#cb23-206" aria-hidden="true" tabindex="-1"></a><span class="ss">## Reporting Results</span></span>
-<span id="cb23-207"><a href="#cb23-207" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-208"><a href="#cb23-208" aria-hidden="true" tabindex="-1"></a><span class="ss">There is a very standard format for reporting regression results in economics. The package `stargazer` is well suited for producing tables of regression results in that standard format. I have another handout, [stargazer_handout.html](https://edward-vytlacil.github.io/Handouts/stargazer_handout.html) which covers producing regression tables with `stargazer` in some depth. [The [stargazer cheatsheet](https://www.jakeruss.com/cheatsheets/stargazer/) by Jake Russ is an excellent, and more detailed, resource.]{.aside} As emphasized by the handout, by default `stargazer` will report the non-robust s.e. (and t-statistics, p-values, and CIs based on the non-robust s.e.) from the default `lm` s.e.. One option to produce a table with robust s.e. (and inference based on the robust s.e.) is to input into `stargazer` custom s.e. and p-values from `coeftest` with option `vcov=vcovHC` (and/or custom CIs from `confint` with option `vcov=vcovHC` ).</span></span>
-<span id="cb23-209"><a href="#cb23-209" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-210"><a href="#cb23-210" aria-hidden="true" tabindex="-1"></a><span class="ss">Here I just demonstrate an example for the CPS wage regressions.</span></span>
-<span id="cb23-211"><a href="#cb23-211" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-214"><a href="#cb23-214" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb23-215"><a href="#cb23-215" aria-hidden="true" tabindex="-1"></a><span class="ss">#| code-fold: true</span></span>
-<span id="cb23-216"><a href="#cb23-216" aria-hidden="true" tabindex="-1"></a><span class="ss">#| output: asis</span></span>
-<span id="cb23-217"><a href="#cb23-217" aria-hidden="true" tabindex="-1"></a><span class="ss">regtest.1 &lt;- coeftest(reg.1,vcov=vcovHC)</span></span>
-<span id="cb23-218"><a href="#cb23-218" aria-hidden="true" tabindex="-1"></a><span class="ss">regtest.2 &lt;- coeftest(reg.2,vcov=vcovHC)</span></span>
-<span id="cb23-219"><a href="#cb23-219" aria-hidden="true" tabindex="-1"></a><span class="ss">regtest.3 &lt;- coeftest(reg.3,vcov=vcovHC)</span></span>
-<span id="cb23-220"><a href="#cb23-220" aria-hidden="true" tabindex="-1"></a><span class="ss">regtest.4 &lt;- coeftest(reg.4,vcov=vcovHC)</span></span>
-<span id="cb23-221"><a href="#cb23-221" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-222"><a href="#cb23-222" aria-hidden="true" tabindex="-1"></a><span class="ss"># here ^female$ is getting exact match for variable female for order.</span></span>
-<span id="cb23-223"><a href="#cb23-223" aria-hidden="true" tabindex="-1"></a><span class="ss"># following order is constant, exact match female, anything including</span></span>
-<span id="cb23-224"><a href="#cb23-224" aria-hidden="true" tabindex="-1"></a><span class="ss"># education, and then anything including exp</span></span>
-<span id="cb23-225"><a href="#cb23-225" aria-hidden="true" tabindex="-1"></a><span class="ss">vars.order=c(&quot;Constant&quot;,&quot;^female$&quot;,&quot;education&quot;,&quot;exp&quot;)</span></span>
-<span id="cb23-226"><a href="#cb23-226" aria-hidden="true" tabindex="-1"></a><span class="ss">varlabels &lt;- c(&quot;Intercept&quot;, &quot;Female&quot;, &quot;Education&quot;, &quot;Female*Education&quot;, &quot;Experience&quot;, &quot;Experience-squared&quot;,  &quot;Female*Experience&quot;, &quot;Female*Experience-squared&quot;)</span></span>
-<span id="cb23-227"><a href="#cb23-227" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-228"><a href="#cb23-228" aria-hidden="true" tabindex="-1"></a><span class="ss">stargazer(reg.1, reg.2, reg.3, reg.4,dep.var.labels=&quot;Log(Wage)&quot;,</span></span>
-<span id="cb23-229"><a href="#cb23-229" aria-hidden="true" tabindex="-1"></a><span class="ss">          report = &quot;vc*sp&quot;, omit=&quot;region&quot;,</span></span>
-<span id="cb23-230"><a href="#cb23-230" aria-hidden="true" tabindex="-1"></a><span class="ss">          se=list(regtest.1[,2],regtest.2[,2],regtest.3[,2],regtest.4[,2]),</span></span>
-<span id="cb23-231"><a href="#cb23-231" aria-hidden="true" tabindex="-1"></a><span class="ss">          p=list(regtest.1[,4],regtest.2[,4],regtest.3[,4],regtest.4[,4]),</span></span>
-<span id="cb23-232"><a href="#cb23-232" aria-hidden="true" tabindex="-1"></a><span class="ss">          type=&quot;html&quot;, style=&quot;aer&quot;,    intercept.bottom = FALSE, order=vars.order,</span></span>
-<span id="cb23-233"><a href="#cb23-233" aria-hidden="true" tabindex="-1"></a><span class="ss">           add.lines = list(c(&quot;Region Dummies?&quot;, &quot;No&quot;, &quot;No&quot;, &quot;No&quot;, &quot;Yes&quot;)),</span></span>
-<span id="cb23-234"><a href="#cb23-234" aria-hidden="true" tabindex="-1"></a><span class="ss">          covariate.labels=varlabels, </span></span>
-<span id="cb23-235"><a href="#cb23-235" aria-hidden="true" tabindex="-1"></a><span class="ss">          omit.stat=c(&quot;LL&quot;,&quot;ser&quot;,&quot;f&quot;,&quot;adj.rsq&quot;), notes.append = FALSE , notes.align = &quot;l&quot;, </span></span>
-<span id="cb23-236"><a href="#cb23-236" aria-hidden="true" tabindex="-1"></a><span class="ss">          notes = &quot;Data from CPS March 2009 survey, including full-time workers between the ages of eighteen and sixty-five. Reporting heteroscedastic-robust standard errors in parentheses.  Reported p-values are based on these heteroscedastic-robust standard errors.&quot;)</span></span>
-<span id="cb23-237"><a href="#cb23-237" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-238"><a href="#cb23-238" aria-hidden="true" tabindex="-1"></a><span class="ss">```</span></span>
+<div class="sourceCode" id="cb25" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> &quot;Implementing OLS in R&quot;</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="an">author:</span><span class="co"> &quot;Edward Vytlacil&quot;</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="an">date:</span><span class="co"> &quot;June 22, 2022&quot;</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="an">toc:</span><span class="co"> true</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="co">   html:</span></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a><span class="co">    html-math-method: katex</span></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a><span class="co">    code-tools: true</span></span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a><span class="co">    self-contained: true</span></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a><span class="an">execute:</span></span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a><span class="co">  warning: false</span></span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a><span class="an">reference-location:</span><span class="co"> margin</span></span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a><span class="an">citation-location:</span><span class="co"> margin</span></span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a><span class="an">bibliography:</span><span class="co"> handouts.bib</span></span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a><span class="fu">## Load Libraries</span></span>
+<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a>In **R**, we will typically implement linear regression in three stages: use base-**R** function <span class="in">`lm`</span> to fit the model by OLS; use function <span class="in">`vcovHC`</span> from package <span class="in">`lmtest`</span> and function <span class="in">`coeftest`</span> from package <span class="in">`lmtest`</span> to construct heteroscedastic-robust s.e. and perform inference; and finally feed those results into <span class="in">`stargazer`</span> to create a table of regression results that includes heteroscedastic s.e. and appropriate inference results.</span>
+<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a>Additionally, the package <span class="in">`car`</span> has useful functions for regression, including the function <span class="in">`linearHypothesis`</span> for implementing Wald tests of joint null hypotheses.</span>
+<span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
+<span id="cb25-25"><a href="#cb25-25" aria-hidden="true" tabindex="-1"></a>flowchart LR</span>
+<span id="cb25-26"><a href="#cb25-26" aria-hidden="true" tabindex="-1"></a>  A[lm &lt;br&gt; run regression] --&gt; B(confint, vcov=vcovHC &lt;br&gt; robust CI )</span>
+<span id="cb25-27"><a href="#cb25-27" aria-hidden="true" tabindex="-1"></a>  A--&gt; C(coeftest, vcov=vcovHC &lt;br&gt; robust p-<span class="fu">values</span>, <span class="ot">s.e.</span><span class="st">)</span></span>
+<span id="cb25-28"><a href="#cb25-28" aria-hidden="true" tabindex="-1"></a><span class="st">  A--&gt; D(linearHypothesis, vcov=vcovHC &lt;br&gt; robust Wald-test)</span></span>
+<span id="cb25-29"><a href="#cb25-29" aria-hidden="true" tabindex="-1"></a><span class="st">  B--&gt; E{Stargazer &lt;br&gt; regression table}</span></span>
+<span id="cb25-30"><a href="#cb25-30" aria-hidden="true" tabindex="-1"></a><span class="st">  C--&gt; E</span></span>
+<span id="cb25-31"><a href="#cb25-31" aria-hidden="true" tabindex="-1"></a><span class="st">  D--&gt; E</span></span>
+<span id="cb25-32"><a href="#cb25-32" aria-hidden="true" tabindex="-1"></a><span class="st">```</span></span>
+<span id="cb25-33"><a href="#cb25-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-34"><a href="#cb25-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-35"><a href="#cb25-35" aria-hidden="true" tabindex="-1"></a><span class="st">| Library     | Purpose                                                                    |</span></span>
+<span id="cb25-36"><a href="#cb25-36" aria-hidden="true" tabindex="-1"></a><span class="st">|-----------------------------|-------------------------------------------|</span></span>
+<span id="cb25-37"><a href="#cb25-37" aria-hidden="true" tabindex="-1"></a><span class="st">| `sandwich`  | package by </span><span class="dt">@zeileis2006object</span><span class="st"> for robust variance estimation, including for linear regression models</span><span class="ot">.</span> The reference manual is [here](https://cran.r<span class="ot">-p</span>roject.org/web/packages/sandwich/sandwich.pdf). Below we will <span class="fu">use</span> function <span class="ot">`</span><span class="st">vcovHC</span><span class="ot">`</span> <span class="kw">for</span> heteroscedastic<span class="ot">-r</span>obust variance estimation. |</span>
+<span id="cb25-38"><a href="#cb25-38" aria-hidden="true" tabindex="-1"></a>| <span class="ot">`</span><span class="st">lmtest</span><span class="ot">`</span>    | <span class="kw">package</span> by <span class="dt">@hothorn2015package</span> provides various functions <span class="kw">for</span> inference. Below we will <span class="fu">use</span> the function <span class="ot">`</span><span class="st">coeftest</span><span class="ot">`</span> <span class="kw">for</span> inference <span class="ot">and</span> <span class="ot">`</span><span class="st">confint</span><span class="ot">`</span> <span class="kw">for</span> confidence intervals.                                                                                                                 |</span>
+<span id="cb25-39"><a href="#cb25-39" aria-hidden="true" tabindex="-1"></a>| <span class="ot">`</span><span class="st">car</span><span class="ot">`</span>       | <span class="kw">package</span> by <span class="dt">@fox2012package</span> provides functions <span class="kw">for</span> regression analysis. Below we will <span class="fu">use</span> the function <span class="ot">`</span><span class="st">linearhypothesis</span><span class="ot">`</span> to implement Wald tests of joint null hypotheses.                                                                                                               |</span>
+<span id="cb25-40"><a href="#cb25-40" aria-hidden="true" tabindex="-1"></a>| <span class="ot">`</span><span class="st">stargazer</span><span class="ot">`</span> | <span class="kw">package</span> by <span class="dt">@hlavac2022stargazer</span> <span class="kw">for</span> creating tables. Creates publication<span class="ot">-r</span>eady tables that are especially well<span class="ot">-s</span>uited <span class="kw">for</span> reporting regression results in the standard <span class="fu">format</span> <span class="kw">for</span> academic papers in economics <span class="ot">and</span> other social sciences.                                                |</span>
+<span id="cb25-41"><a href="#cb25-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-42"><a href="#cb25-42" aria-hidden="true" tabindex="-1"></a>In addition, <span class="kw">for</span> this particular handout, we will <span class="fu">use</span> one more <span class="kw">package</span>: <span class="ot">`</span><span class="st">haven</span><span class="ot">`</span> to <span class="fu">read</span> in STATA .dta data sets into *<span class="dt">*R</span>*<span class="wa">*.</span></span>
+<span id="cb25-43"><a href="#cb25-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-46"><a href="#cb25-46" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb25-47"><a href="#cb25-47" aria-hidden="true" tabindex="-1"></a><span class="st">#| label: load-packages-1</span></span>
+<span id="cb25-48"><a href="#cb25-48" aria-hidden="true" tabindex="-1"></a><span class="st">#| echo: true</span></span>
+<span id="cb25-49"><a href="#cb25-49" aria-hidden="true" tabindex="-1"></a><span class="st">#| code-fold: true</span></span>
+<span id="cb25-50"><a href="#cb25-50" aria-hidden="true" tabindex="-1"></a><span class="st"># install packages using install.packages( )  if not already installed  </span></span>
+<span id="cb25-51"><a href="#cb25-51" aria-hidden="true" tabindex="-1"></a><span class="st">library(sandwich)</span></span>
+<span id="cb25-52"><a href="#cb25-52" aria-hidden="true" tabindex="-1"></a><span class="st">library(lmtest)</span></span>
+<span id="cb25-53"><a href="#cb25-53" aria-hidden="true" tabindex="-1"></a><span class="st">library(car)</span></span>
+<span id="cb25-54"><a href="#cb25-54" aria-hidden="true" tabindex="-1"></a><span class="st">library(stargazer)</span></span>
+<span id="cb25-55"><a href="#cb25-55" aria-hidden="true" tabindex="-1"></a><span class="st">library(haven)</span></span>
+<span id="cb25-56"><a href="#cb25-56" aria-hidden="true" tabindex="-1"></a><span class="ot">```</span></span>
+<span id="cb25-57"><a href="#cb25-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-58"><a href="#cb25-58" aria-hidden="true" tabindex="-1"></a><span class="co">## Data for this handout</span></span>
+<span id="cb25-59"><a href="#cb25-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-60"><a href="#cb25-60" aria-hidden="true" tabindex="-1"></a>In this handout, we will illustrate linear regression using the CPS data set posted on [Bruce Hansen<span class="ot">&#39;</span><span class="ss">s website](https://www.ssc.wisc.edu/~bhansen/econometrics/) to accompany his textbook. The data set is posted in a zip file that can be downloaded [here](https://www.ssc.wisc.edu/~bhansen/econometrics/Econometrics%20Data.zip). We will read in the STATA .dta formatted versions of the data set. I have also posted the data set and its documentation to my personal webpage (linked below).</span></span>
+<span id="cb25-61"><a href="#cb25-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-62"><a href="#cb25-62" aria-hidden="true" tabindex="-1"></a><span class="ss">| Data File                                                                  | Documentation                                                                                      | Description                                                              |</span></span>
+<span id="cb25-63"><a href="#cb25-63" aria-hidden="true" tabindex="-1"></a><span class="ss">|-------------------|---------------------------|---------------------------|</span></span>
+<span id="cb25-64"><a href="#cb25-64" aria-hidden="true" tabindex="-1"></a><span class="ss">| cps09mar.dta ([link](https://edward-vytlacil.github.io/Data/cps09mar.dta)) | cps09mar_description.pdf ([link](https://edward-vytlacil.github.io/Data/cps09mar_description.pdf)) | Subset of March 2009 CPS that is relevant for estimating wage equations. |</span></span>
+<span id="cb25-65"><a href="#cb25-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-66"><a href="#cb25-66" aria-hidden="true" tabindex="-1"></a><span class="ss">## `lm` and Model Syntax</span></span>
+<span id="cb25-67"><a href="#cb25-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-68"><a href="#cb25-68" aria-hidden="true" tabindex="-1"></a><span class="ss">We implement OLS regression with the **R** function `lm` with the syntax `lm(y~model, data=df)` where `y` is the left-hand side variable (i.e., regressand) for the regression model, `model` is a specification of the right hand side of the regression model, and `df` is the data.frame. Here are some examples: [See `?formula` for information on what model formulas are allowed.]{.aside}</span></span>
+<span id="cb25-69"><a href="#cb25-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-70"><a href="#cb25-70" aria-hidden="true" tabindex="-1"></a><span class="ss">::: column-page</span></span>
+<span id="cb25-71"><a href="#cb25-71" aria-hidden="true" tabindex="-1"></a><span class="ss">| R syntax                      | Model fit                                                                                                                                                                                | Notes                                                                                                                           |</span></span>
+<span id="cb25-72"><a href="#cb25-72" aria-hidden="true" tabindex="-1"></a><span class="ss">|--------------------|:--------------------------------|-------------------|</span></span>
+<span id="cb25-73"><a href="#cb25-73" aria-hidden="true" tabindex="-1"></a><span class="ss">| `y~x`                         | $y_i = \beta_0 + \beta_1 x_i +\epsilon_i$                                                                                                                                                |                                                                                                                                 |</span></span>
+<span id="cb25-74"><a href="#cb25-74" aria-hidden="true" tabindex="-1"></a><span class="ss">| `y~x+w`                       | $y = \beta_0 + \beta_1 x_i+ \beta_2 w_i +\epsilon_i$                                                                                                                                     |                                                                                                                                 |</span></span>
+<span id="cb25-75"><a href="#cb25-75" aria-hidden="true" tabindex="-1"></a><span class="ss">| `y~x+w+x:w`                   | $y_i = \beta_0 + \beta_1 x_i + \beta_2 w_i + \beta_3 (x_i \cdot w_i) + \epsilon_i$                                                                                                       | `x:w` is interaction term                                                                                                       |</span></span>
+<span id="cb25-76"><a href="#cb25-76" aria-hidden="true" tabindex="-1"></a><span class="ss">| `y~x*w`                       | $y_i = \beta_0 + \beta_1 x_i + \beta_2 w_i + \beta_3 (x_i \cdot w_i) + \epsilon_i$                                                                                                       | `x*w` includes x, w, and x:w                                                                                                    |</span></span>
+<span id="cb25-77"><a href="#cb25-77" aria-hidden="true" tabindex="-1"></a><span class="ss">| `y~x*w-x`                     | $y_i = \beta_0 + \beta_1 w_i + \beta_2 (x_i \cdot w_i) + \epsilon_i$                                                                                                                     | `-x` removes variable `x`                                                                                                       |</span></span>
+<span id="cb25-78"><a href="#cb25-78" aria-hidden="true" tabindex="-1"></a><span class="ss">| `y~x*(w+z)`                   | $y_i = \beta_0 + \beta_1 x_i + \beta_2 w_i + \beta_3 z_i + \beta_4 (x_i \cdot w_i) + \beta_5 (x_i \cdot z_i) + \epsilon_i$                                                               | `x*(w+z)` includes x, w, z, x:w, and x:z                                                                                        |</span></span>
+<span id="cb25-79"><a href="#cb25-79" aria-hidden="true" tabindex="-1"></a><span class="ss">| `y~(x+w+z)^2`                 | $y_i = \beta_0 + \beta_1 x_i + \beta_2 w_i + \beta_3 z_i + \beta_4 (x_i \cdot w_i) + \beta_5 (x_i \cdot z_i) + \beta_6 (w_i \cdot z_i) + \epsilon_i$                                     | `(x+w+z)^2` includes all main effects and all second-order interactions.                                                        |</span></span>
+<span id="cb25-80"><a href="#cb25-80" aria-hidden="true" tabindex="-1"></a><span class="ss">| `y~x*w*z`                     | $y_i = \beta_0 + \beta_1 x_i + \beta_2 w_i + \beta_3 z_i + \beta_4 (x_i \cdot w_i) + \beta_5 (x_i \cdot z_i) + \beta_6 (w_i \cdot z_i) + \beta_7 (x_i \cdot w_i \cdot z_i) + \epsilon_i$ | `x*w*z` includes all main effects, second-order interactions and third order interaction.                                       |</span></span>
+<span id="cb25-81"><a href="#cb25-81" aria-hidden="true" tabindex="-1"></a><span class="ss">| `I(ln(y))~x`                  | $\ln(y_i) = \beta_0 + \beta_1 x_i +\epsilon_i$                                                                                                                                           | `I( )` allows you create a new variable for regression.                                                                         |</span></span>
+<span id="cb25-82"><a href="#cb25-82" aria-hidden="true" tabindex="-1"></a><span class="ss">| `y~x+I(x^2)`                  | $y_i = \beta_0 + \beta_1 x_i + \beta_2 x_i^2 +\epsilon_i$                                                                                                                                |                                                                                                                                 |</span></span>
+<span id="cb25-83"><a href="#cb25-83" aria-hidden="true" tabindex="-1"></a><span class="ss">| `y~poly(x,degree=2,raw=TRUE)` | $y_i = \beta_0 + \beta_1 x_i + \beta_2 x_i^2 +\epsilon_i$                                                                                                                                | `poly(x,degree=k,raw=TRUE)` includes a k order polynomial in x. `raw=FALSE` would include a k order orthogonal polynomial in x. |</span></span>
+<span id="cb25-84"><a href="#cb25-84" aria-hidden="true" tabindex="-1"></a><span class="ss">| `y~x+as.factor(w)`            | $y_i = \beta_0 + \beta_1 x_i + \sum_{l=1}^L \beta_{1+l} 1\{w_i=w_l\} \  +\epsilon_i$                                                                                                     | For discrete `w`, `as.factor(w)` includes a dummy variable for each value of `w`.                                               |</span></span>
+<span id="cb25-85"><a href="#cb25-85" aria-hidden="true" tabindex="-1"></a><span class="ss">:::</span></span>
+<span id="cb25-86"><a href="#cb25-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-87"><a href="#cb25-87" aria-hidden="true" tabindex="-1"></a><span class="ss">For example, consider following regressions using the CPS data:</span></span>
+<span id="cb25-88"><a href="#cb25-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-91"><a href="#cb25-91" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb25-92"><a href="#cb25-92" aria-hidden="true" tabindex="-1"></a><span class="ss"># read in data set (from STATA .dta format)</span></span>
+<span id="cb25-93"><a href="#cb25-93" aria-hidden="true" tabindex="-1"></a><span class="ss">df.CPS &lt;- read_dta(&quot;/Users/ev6/Documents/GitHub/edward-vytlacil.github.io/Data/cps09mar.dta&quot;)</span></span>
+<span id="cb25-94"><a href="#cb25-94" aria-hidden="true" tabindex="-1"></a><span class="ss">#construct log wage variable for CPS</span></span>
+<span id="cb25-95"><a href="#cb25-95" aria-hidden="true" tabindex="-1"></a><span class="ss">df.CPS$logwage &lt;- with(df.CPS,log(earnings/hours)) </span></span>
+<span id="cb25-96"><a href="#cb25-96" aria-hidden="true" tabindex="-1"></a><span class="ss">#construct experience proxy variable for CPS</span></span>
+<span id="cb25-97"><a href="#cb25-97" aria-hidden="true" tabindex="-1"></a><span class="ss">df.CPS$exp &lt;- with(df.CPS,age - education-6) </span></span>
+<span id="cb25-98"><a href="#cb25-98" aria-hidden="true" tabindex="-1"></a><span class="ss">#restrict sample to ages 18 to 65</span></span>
+<span id="cb25-99"><a href="#cb25-99" aria-hidden="true" tabindex="-1"></a><span class="ss">df.CPS &lt;- df.CPS[df.CPS$age&gt;=18 &amp; df.CPS$age&lt;=65, ]</span></span>
+<span id="cb25-100"><a href="#cb25-100" aria-hidden="true" tabindex="-1"></a><span class="ss"># regress log wage on education and quadratic in experience</span></span>
+<span id="cb25-101"><a href="#cb25-101" aria-hidden="true" tabindex="-1"></a><span class="ss">reg.1 &lt;- lm(logwage ~ education + exp + I(exp^2),data=df.CPS)</span></span>
+<span id="cb25-102"><a href="#cb25-102" aria-hidden="true" tabindex="-1"></a><span class="ss"># as above, but add female dummy</span></span>
+<span id="cb25-103"><a href="#cb25-103" aria-hidden="true" tabindex="-1"></a><span class="ss">reg.2 &lt;- lm(logwage ~ education + exp + I(exp^2) + female,data=df.CPS)</span></span>
+<span id="cb25-104"><a href="#cb25-104" aria-hidden="true" tabindex="-1"></a><span class="ss"># as above, but interact education and exp with female dummy</span></span>
+<span id="cb25-105"><a href="#cb25-105" aria-hidden="true" tabindex="-1"></a><span class="ss">reg.3 &lt;- lm(logwage ~ female*(education + exp + I(exp^2)),data=df.CPS)</span></span>
+<span id="cb25-106"><a href="#cb25-106" aria-hidden="true" tabindex="-1"></a><span class="ss"># as above, but add dummy variables (fixed effects) for each region</span></span>
+<span id="cb25-107"><a href="#cb25-107" aria-hidden="true" tabindex="-1"></a><span class="ss">reg.4 &lt;- lm(logwage ~ female*(education + exp + I(exp^2))+</span></span>
+<span id="cb25-108"><a href="#cb25-108" aria-hidden="true" tabindex="-1"></a><span class="ss">                                as.factor(region),data=df.CPS)</span></span>
+<span id="cb25-109"><a href="#cb25-109" aria-hidden="true" tabindex="-1"></a><span class="ss">```</span></span>
+<span id="cb25-110"><a href="#cb25-110" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-111"><a href="#cb25-111" aria-hidden="true" tabindex="-1"></a><span class="ss">::: {.callout-note collapse=&quot;true&quot;}</span></span>
+<span id="cb25-112"><a href="#cb25-112" aria-hidden="true" tabindex="-1"></a><span class="ss"># Update Function</span></span>
+<span id="cb25-113"><a href="#cb25-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-114"><a href="#cb25-114" aria-hidden="true" tabindex="-1"></a><span class="ss">The `update` function allows you to modify a previously saved regression specification. For example:</span></span>
+<span id="cb25-115"><a href="#cb25-115" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-118"><a href="#cb25-118" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb25-119"><a href="#cb25-119" aria-hidden="true" tabindex="-1"></a><span class="ss">#| eval: false</span></span>
+<span id="cb25-120"><a href="#cb25-120" aria-hidden="true" tabindex="-1"></a><span class="ss">reg.1 &lt;- lm(logwage ~ education + exp + I(exp^2),data=df.CPS)</span></span>
+<span id="cb25-121"><a href="#cb25-121" aria-hidden="true" tabindex="-1"></a><span class="ss"># update reg.1 to add female dummy</span></span>
+<span id="cb25-122"><a href="#cb25-122" aria-hidden="true" tabindex="-1"></a><span class="ss">reg.2 &lt;- update(reg.1, .~.+female)</span></span>
+<span id="cb25-123"><a href="#cb25-123" aria-hidden="true" tabindex="-1"></a><span class="ss"># update reg.1 to add female dummy and interactions with female</span></span>
+<span id="cb25-124"><a href="#cb25-124" aria-hidden="true" tabindex="-1"></a><span class="ss">reg.3 &lt;- update(reg.1, .~.*female)</span></span>
+<span id="cb25-125"><a href="#cb25-125" aria-hidden="true" tabindex="-1"></a><span class="ss"># update reg.3 to  add dummy variables (fixed effects) for each region</span></span>
+<span id="cb25-126"><a href="#cb25-126" aria-hidden="true" tabindex="-1"></a><span class="ss">reg.4 &lt;-  update(reg.3, .~. +as.factor(region))</span></span>
+<span id="cb25-127"><a href="#cb25-127" aria-hidden="true" tabindex="-1"></a><span class="ss">```</span></span>
+<span id="cb25-128"><a href="#cb25-128" aria-hidden="true" tabindex="-1"></a><span class="ss">:::</span></span>
+<span id="cb25-129"><a href="#cb25-129" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-130"><a href="#cb25-130" aria-hidden="true" tabindex="-1"></a><span class="ss">::: {.callout-note collapse=&quot;true&quot;}</span></span>
+<span id="cb25-131"><a href="#cb25-131" aria-hidden="true" tabindex="-1"></a><span class="ss"># Subset of data for `lm`</span></span>
+<span id="cb25-132"><a href="#cb25-132" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-133"><a href="#cb25-133" aria-hidden="true" tabindex="-1"></a><span class="ss">You can optionally use the `subset` option in `lm` to only use a subset of the data for the regression. For example, `lm(logwage ~ education + exp + I(exp^2),data=df.CPS,subset=female==1)` only uses the `female==1` observations. Alternatively, if `reg.1` is the saved regression on the full sample, `update(reg.1, subset=female==1)` is a new regression model only using the `female==1` observations.</span></span>
+<span id="cb25-134"><a href="#cb25-134" aria-hidden="true" tabindex="-1"></a><span class="ss">:::</span></span>
+<span id="cb25-135"><a href="#cb25-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-136"><a href="#cb25-136" aria-hidden="true" tabindex="-1"></a><span class="ss">## `lm` and Model Output</span></span>
+<span id="cb25-137"><a href="#cb25-137" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-138"><a href="#cb25-138" aria-hidden="true" tabindex="-1"></a><span class="ss">Consider the code `reg.1 &lt;- lm(logwage ~ education + exp + I(exp^2),data=df.CPS)` The resulting object `reg.1` contains the results from the regression. It is particularly convenient to use the `summary`function to access the results.[See `?summary.lm` for more details.]{.aside} For example:</span></span>
+<span id="cb25-139"><a href="#cb25-139" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-142"><a href="#cb25-142" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb25-143"><a href="#cb25-143" aria-hidden="true" tabindex="-1"></a><span class="ss">summary(reg.1)</span></span>
+<span id="cb25-144"><a href="#cb25-144" aria-hidden="true" tabindex="-1"></a><span class="ss">```</span></span>
+<span id="cb25-145"><a href="#cb25-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-146"><a href="#cb25-146" aria-hidden="true" tabindex="-1"></a><span class="ss">It is important to note that the default standard errors (and thus the default t-statistics and p-values) from the `lm` function are only valid under homoscedasticity. We will return to using heteroscedastic-robust standard errors later in this handout.</span></span>
+<span id="cb25-147"><a href="#cb25-147" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-148"><a href="#cb25-148" aria-hidden="true" tabindex="-1"></a><span class="ss">You can further extract results from the saved regression object. For example, `summary(reg.1)$coefficients` returns a matrix with estimated coefficients in first column, standard errors in second column, and t-statistics in third column (with s.e. and t-statistics based on non-robust variance estimation), while `summary(reg.1)$residuals` extracts the OLS residuals. The functions `coef`, `residuals` and `fitted` can also be applied to the saved regression object, for example, `coef(reg.1)` returns the estimated coefficients, while `coef(summary(reg.1))` returns a matrix of estimated coefficients, standard errors, and t-statistics, same as `summary(reg.1)$coefficients`. As another example, `residuals(reg.1)`, `residuals(summary(reg.1))`, `reg.1$residuals` and `summary(reg.1)$residuals` all return the sample residuals.</span></span>
+<span id="cb25-149"><a href="#cb25-149" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-150"><a href="#cb25-150" aria-hidden="true" tabindex="-1"></a><span class="ss">## Heteroscedastic Robust Inference</span></span>
+<span id="cb25-151"><a href="#cb25-151" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-152"><a href="#cb25-152" aria-hidden="true" tabindex="-1"></a><span class="ss">As previously mentioned, `lm`  returns standard errors (and thus t-statistics and p-values) based on  non-robust variance estimation. To obtain results based on heteroscedastic robust variance estimation, we typically use `vcovHC` from package `sandwich`.[It is also common to use `vcovCL` from the `sandwich` package in case of clustered data.]{.aside} [`vcovHC` by default is using the HC3 heteroscedastic robust variance estimator, though other heteroscedastic robust variance estimators can be chosen. See @zeileis2004econometric]{.aside} For example:</span></span>
+<span id="cb25-153"><a href="#cb25-153" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-156"><a href="#cb25-156" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb25-157"><a href="#cb25-157" aria-hidden="true" tabindex="-1"></a><span class="ss"># heteroscedastic-robust variance estimate (HC3) for reg.1</span></span>
+<span id="cb25-158"><a href="#cb25-158" aria-hidden="true" tabindex="-1"></a><span class="ss">vcovHC(reg.1)</span></span>
+<span id="cb25-159"><a href="#cb25-159" aria-hidden="true" tabindex="-1"></a><span class="ss">```</span></span>
+<span id="cb25-160"><a href="#cb25-160" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-161"><a href="#cb25-161" aria-hidden="true" tabindex="-1"></a><span class="ss">Other useful functions include `coeftest` and `confint` from package `lmtest` for inference and confidence intervals using a specified estimator for the variance of the OLS coefficients, for example, using `vcovHC`. Likewise, the function `linearHypotheis` from package `car` can be used for Wald tests of joint nulls, where one can again specify that the test use using a specified estimator for the variance of the OLS coefficients, for example, `vcovHC`. For example:</span></span>
+<span id="cb25-162"><a href="#cb25-162" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-165"><a href="#cb25-165" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb25-166"><a href="#cb25-166" aria-hidden="true" tabindex="-1"></a><span class="ss"># s.e., t-statistics, and p-values using robust variance estimate</span></span>
+<span id="cb25-167"><a href="#cb25-167" aria-hidden="true" tabindex="-1"></a><span class="ss">coeftest(reg.1,vcov=vcovHC)</span></span>
+<span id="cb25-168"><a href="#cb25-168" aria-hidden="true" tabindex="-1"></a><span class="ss"># corresponding CIs</span></span>
+<span id="cb25-169"><a href="#cb25-169" aria-hidden="true" tabindex="-1"></a><span class="ss">confint(reg.1,level=0.95,vcov=vcovHC)</span></span>
+<span id="cb25-170"><a href="#cb25-170" aria-hidden="true" tabindex="-1"></a><span class="ss"># testing joint null that coefficient on exp=0 and coeff on exp^2=0</span></span>
+<span id="cb25-171"><a href="#cb25-171" aria-hidden="true" tabindex="-1"></a><span class="ss">linearHypothesis(reg.2,c(&quot;exp=0&quot;,&quot;I(exp^2)=0&quot;),test=&quot;Chisq&quot;,vcov=vcovHC)</span></span>
+<span id="cb25-172"><a href="#cb25-172" aria-hidden="true" tabindex="-1"></a><span class="ss">```</span></span>
+<span id="cb25-173"><a href="#cb25-173" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-174"><a href="#cb25-174" aria-hidden="true" tabindex="-1"></a><span class="ss">::: {.callout-note collapse=&quot;true&quot;}</span></span>
+<span id="cb25-175"><a href="#cb25-175" aria-hidden="true" tabindex="-1"></a><span class="ss"># Grep Function</span></span>
+<span id="cb25-176"><a href="#cb25-176" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-177"><a href="#cb25-177" aria-hidden="true" tabindex="-1"></a><span class="ss">The UNIX command `grep` is implemented as a function in **R**. The function allows you to search text for all lines that match the desired expression. For example</span></span>
+<span id="cb25-178"><a href="#cb25-178" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-181"><a href="#cb25-181" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb25-182"><a href="#cb25-182" aria-hidden="true" tabindex="-1"></a><span class="ss"># covariate names from reg.4</span></span>
+<span id="cb25-183"><a href="#cb25-183" aria-hidden="true" tabindex="-1"></a><span class="ss">coefs &lt;- names(coef(reg.4))</span></span>
+<span id="cb25-184"><a href="#cb25-184" aria-hidden="true" tabindex="-1"></a><span class="ss">coefs</span></span>
+<span id="cb25-185"><a href="#cb25-185" aria-hidden="true" tabindex="-1"></a><span class="ss"># search names that include expression &quot;region&quot;</span></span>
+<span id="cb25-186"><a href="#cb25-186" aria-hidden="true" tabindex="-1"></a><span class="ss"># grep returns indices that include expressiom</span></span>
+<span id="cb25-187"><a href="#cb25-187" aria-hidden="true" tabindex="-1"></a><span class="ss">grep(&quot;region&quot;,coefs)</span></span>
+<span id="cb25-188"><a href="#cb25-188" aria-hidden="true" tabindex="-1"></a><span class="ss"># to get all names that include &quot;region&quot;</span></span>
+<span id="cb25-189"><a href="#cb25-189" aria-hidden="true" tabindex="-1"></a><span class="ss">coefs[grep(&quot;region&quot;,coefs)]</span></span>
+<span id="cb25-190"><a href="#cb25-190" aria-hidden="true" tabindex="-1"></a><span class="ss">```</span></span>
+<span id="cb25-191"><a href="#cb25-191" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-192"><a href="#cb25-192" aria-hidden="true" tabindex="-1"></a><span class="ss">Using `grep` with `linearHypothesis` can allow you to test joint null hypothesis for all coefficients that include that expression. For example</span></span>
+<span id="cb25-193"><a href="#cb25-193" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-196"><a href="#cb25-196" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb25-197"><a href="#cb25-197" aria-hidden="true" tabindex="-1"></a><span class="ss">#  reg.4</span></span>
+<span id="cb25-198"><a href="#cb25-198" aria-hidden="true" tabindex="-1"></a><span class="ss">coefs &lt;- names(coef(reg.4))</span></span>
+<span id="cb25-199"><a href="#cb25-199" aria-hidden="true" tabindex="-1"></a><span class="ss"># test null that region dummies all have 0 coefficients</span></span>
+<span id="cb25-200"><a href="#cb25-200" aria-hidden="true" tabindex="-1"></a><span class="ss"># and all interactions with region dummies have 0 coeffiicnets</span></span>
+<span id="cb25-201"><a href="#cb25-201" aria-hidden="true" tabindex="-1"></a><span class="ss">linearHypothesis(reg.4, coefs[grep(&quot;region&quot;, coefs)],test=&quot;Chisq&quot;,vcov=vcovHC)</span></span>
+<span id="cb25-202"><a href="#cb25-202" aria-hidden="true" tabindex="-1"></a><span class="ss"># instead test all interactions in model have zero coefficients </span></span>
+<span id="cb25-203"><a href="#cb25-203" aria-hidden="true" tabindex="-1"></a><span class="ss">linearHypothesis(reg.4, coefs[grep(&quot;:&quot;, coefs)],test=&quot;Chisq&quot;,vcov=vcovHC)</span></span>
+<span id="cb25-204"><a href="#cb25-204" aria-hidden="true" tabindex="-1"></a><span class="ss">```</span></span>
+<span id="cb25-205"><a href="#cb25-205" aria-hidden="true" tabindex="-1"></a><span class="ss">:::</span></span>
+<span id="cb25-206"><a href="#cb25-206" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-207"><a href="#cb25-207" aria-hidden="true" tabindex="-1"></a><span class="ss">## Reporting Results</span></span>
+<span id="cb25-208"><a href="#cb25-208" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-209"><a href="#cb25-209" aria-hidden="true" tabindex="-1"></a><span class="ss">There is a very standard format for reporting regression results in economics. The package `stargazer` is well suited for producing tables of regression results in that standard format. I have another handout, [stargazer_handout.html](https://edward-vytlacil.github.io/Handouts/stargazer_handout.html) which covers producing regression tables with `stargazer` in some depth. [The [stargazer cheatsheet](https://www.jakeruss.com/cheatsheets/stargazer/) by Jake Russ is an excellent, and more detailed, resource.]{.aside} As emphasized by the handout, by default `stargazer` will report the non-robust s.e. (and t-statistics, p-values, and CIs based on the non-robust s.e.) from the default `lm` s.e.. One option to produce a table with robust s.e. (and inference based on the robust s.e.) is to input into `stargazer` custom s.e. and p-values from `coeftest` with option `vcov=vcovHC` (and/or custom CIs from `confint` with option `vcov=vcovHC` ).</span></span>
+<span id="cb25-210"><a href="#cb25-210" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-211"><a href="#cb25-211" aria-hidden="true" tabindex="-1"></a><span class="ss">Here I just demonstrate an example for the CPS wage regressions.</span></span>
+<span id="cb25-212"><a href="#cb25-212" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-215"><a href="#cb25-215" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb25-216"><a href="#cb25-216" aria-hidden="true" tabindex="-1"></a><span class="ss">#| code-fold: true</span></span>
+<span id="cb25-217"><a href="#cb25-217" aria-hidden="true" tabindex="-1"></a><span class="ss">#| output: asis</span></span>
+<span id="cb25-218"><a href="#cb25-218" aria-hidden="true" tabindex="-1"></a><span class="ss">regtest.1 &lt;- coeftest(reg.1,vcov=vcovHC)</span></span>
+<span id="cb25-219"><a href="#cb25-219" aria-hidden="true" tabindex="-1"></a><span class="ss">regtest.2 &lt;- coeftest(reg.2,vcov=vcovHC)</span></span>
+<span id="cb25-220"><a href="#cb25-220" aria-hidden="true" tabindex="-1"></a><span class="ss">regtest.3 &lt;- coeftest(reg.3,vcov=vcovHC)</span></span>
+<span id="cb25-221"><a href="#cb25-221" aria-hidden="true" tabindex="-1"></a><span class="ss">regtest.4 &lt;- coeftest(reg.4,vcov=vcovHC)</span></span>
+<span id="cb25-222"><a href="#cb25-222" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-223"><a href="#cb25-223" aria-hidden="true" tabindex="-1"></a><span class="ss"># here ^female$ is getting exact match for variable female for order.</span></span>
+<span id="cb25-224"><a href="#cb25-224" aria-hidden="true" tabindex="-1"></a><span class="ss"># following order is constant, exact match female, anything including</span></span>
+<span id="cb25-225"><a href="#cb25-225" aria-hidden="true" tabindex="-1"></a><span class="ss"># education, and then anything including exp</span></span>
+<span id="cb25-226"><a href="#cb25-226" aria-hidden="true" tabindex="-1"></a><span class="ss">vars.order=c(&quot;Constant&quot;,&quot;^female$&quot;,&quot;education&quot;,&quot;exp&quot;)</span></span>
+<span id="cb25-227"><a href="#cb25-227" aria-hidden="true" tabindex="-1"></a><span class="ss">varlabels &lt;- c(&quot;Intercept&quot;, &quot;Female&quot;, &quot;Education&quot;, &quot;Female*Education&quot;, &quot;Experience&quot;, &quot;Experience-squared&quot;,  &quot;Female*Experience&quot;, &quot;Female*Experience-squared&quot;)</span></span>
+<span id="cb25-228"><a href="#cb25-228" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-229"><a href="#cb25-229" aria-hidden="true" tabindex="-1"></a><span class="ss">stargazer(reg.1, reg.2, reg.3, reg.4,dep.var.labels=&quot;Log(Wage)&quot;,</span></span>
+<span id="cb25-230"><a href="#cb25-230" aria-hidden="true" tabindex="-1"></a><span class="ss">          report = &quot;vc*sp&quot;, omit=&quot;region&quot;,</span></span>
+<span id="cb25-231"><a href="#cb25-231" aria-hidden="true" tabindex="-1"></a><span class="ss">          se=list(regtest.1[,2],regtest.2[,2],regtest.3[,2],regtest.4[,2]),</span></span>
+<span id="cb25-232"><a href="#cb25-232" aria-hidden="true" tabindex="-1"></a><span class="ss">          p=list(regtest.1[,4],regtest.2[,4],regtest.3[,4],regtest.4[,4]),</span></span>
+<span id="cb25-233"><a href="#cb25-233" aria-hidden="true" tabindex="-1"></a><span class="ss">          type=&quot;html&quot;, style=&quot;aer&quot;,    intercept.bottom = FALSE, order=vars.order,</span></span>
+<span id="cb25-234"><a href="#cb25-234" aria-hidden="true" tabindex="-1"></a><span class="ss">           add.lines = list(c(&quot;Region Dummies?&quot;, &quot;No&quot;, &quot;No&quot;, &quot;No&quot;, &quot;Yes&quot;)),</span></span>
+<span id="cb25-235"><a href="#cb25-235" aria-hidden="true" tabindex="-1"></a><span class="ss">          covariate.labels=varlabels, </span></span>
+<span id="cb25-236"><a href="#cb25-236" aria-hidden="true" tabindex="-1"></a><span class="ss">          omit.stat=c(&quot;LL&quot;,&quot;ser&quot;,&quot;f&quot;,&quot;adj.rsq&quot;), notes.append = FALSE , notes.align = &quot;l&quot;, </span></span>
+<span id="cb25-237"><a href="#cb25-237" aria-hidden="true" tabindex="-1"></a><span class="ss">          notes = &quot;Data from CPS March 2009 survey, including full-time workers between the ages of eighteen and sixty-five. Reporting heteroscedastic-robust standard errors in parentheses.  Reported p-values are based on these heteroscedastic-robust standard errors.&quot;)</span></span>
+<span id="cb25-238"><a href="#cb25-238" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-239"><a href="#cb25-239" aria-hidden="true" tabindex="-1"></a><span class="ss">```</span></span>
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
