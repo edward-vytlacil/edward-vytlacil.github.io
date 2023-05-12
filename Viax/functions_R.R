@@ -1,6 +1,6 @@
 
 # This R script is a supplement to the handout for Lab 1:
-# https://edward-vytlacil.github.io/Labs/Lab1/Lab1_Handout_Summer_2022.html
+# https://edward-vytlacil.github.io/Viax/PROGRESA_Handout_Econ201
 # reviewing user-defined functions 
 
 # if you haven't already installed ggplot

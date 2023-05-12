@@ -1,10 +1,10 @@
 
 # This R script is a supplement to the handout for Lab 1:
-# https://edward-vytlacil.github.io/Labs/Lab1/Lab1_Handout_Summer_2022.html
+# https://edward-vytlacil.github.io/Viax/PROGRESA_Handout_Econ201
 # reviewing use of sapply.  It builds upon
 # what you learned  about functions in R from functions_R.R
 # which you can download from
-# https://edward-vytlacil.github.io/Misc/functions_R.R
+# https://edward-vytlacil.github.io/Viax/functions_R.R
 # You will use sapply extensively in your first problem set.
 
 # defining a new function, called f.1,
