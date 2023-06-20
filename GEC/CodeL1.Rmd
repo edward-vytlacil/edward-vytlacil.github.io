@@ -2,7 +2,7 @@
 title: "R Code used in Review Lecture"
 author: "Edward Vytlacil"
 date: "June 20, 2023"
-output: pdf_document
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
@@ -10,11 +10,12 @@ rm(list=ls())
 knitr::opts_chunk$set(message=FALSE, warning = FALSE)
 ```
 
+This file contains the code corresponding to the review lecture.  The review lecture can be downloaded [here](https://edward-vytlacil.github.io/GEC/Review_Lecture.pdf)
 
-# Central Tendency and Dispersion
-## Using R as calculator
 
-* Computing expected returns, variance of returns of hypothetical investments in slides 8 and 10
+## Slides 8 and 10 
+
+* Using R as calculator to compute expected returns, variance of returns of hypothetical investments in slides 8 and 10
 
 ```{r }
 
@@ -29,11 +30,11 @@ v_r <- .5 *(-1-e_r)^2 + .5 * (1005000/1000000-e_r)^2
 print(v_r)
 ```
 
-# Asset Diversification – Risk and Return Tradeoff
-## Figures 1.1 and 1.2
+## Slides 13-14
 
 * Hypothetical example of risk-return tradeoff for investing in Ford vs Tesla. 
-* Slides 13-14  
+* creating the figures for slides 13-14  
+* using ggplot2 to create the figure, you need to install the package first if you have not done so already.
 
 ```{r }
 library(ggplot2)
@@ -50,13 +51,13 @@ ggplot(df, aes(x = Var, y = Er, color = Company)) +
     xlab("Variance") + ylab("Expected Returns")
 ```
 
-# Example, Covariance
-## Morgan Stanley and Genworth Financial returns in dollars
 
+## Slides 17-18
 
-* Slides 17-18 
+* Example of Morgan Stanley and Genworth Financial returns 
 * $r_B$ are Morgan Stanley monthly returns 
 * $r_C$ are returns Genworth Financial monthly returns. 
+* use readstata13 package to read in data set in STATA format.  You need to install package first if you have not done so already.
 
 ```{r}
 
@@ -76,14 +77,12 @@ cor(data$r_B,data$r_C)
 ```
 
 
-#Asset Diversification – Portfolio Return and Risk
-##First Scenario: Positive Return Covariance 
+## Slide 27-88   
 
-* Slide 17-18  
 * Risk-Return tradeoff (expected return/variance of return tradeoff) for portfolio with:  
 + wF fraction of investment in Ford  
 + wT fraction of investment in Tesla  
-* Scenario with positive covariance in returns
+* Scenario with **positive covariance** in returns
 
 ```{r }
 # library(ggplot2)
@@ -100,16 +99,20 @@ tab$var_p <-  tab$wF^2*var_F +tab$wT^2*var_T +2* tab$wF *(1 - tab$wF)*cov_FT
 
 ggplot() + geom_point(data = tab,
                       aes(x = var_p, y = er_p, color = wF)) +
+    ggtitle("Possible Portfolios with Positive Covariance") +
     xlab("Volatility") +
     ylab("Expected Returns")
 
 ```
 
-#Second Scenario: Negative Return Covariance
+## Slides 32-33   
+
+* Risk-Return tradeoff (expected return/variance of return tradeoff) for portfolio with:  
++ wF fraction of investment in Ford  
++ wT fraction of investment in Tesla  
+* Scenario with **negative covariance** in returns
+
  
-* Risk-Return tradeoff for scenario with negative covariance in returns.  
-* Same code as above except for parameter for covariance in returns.
-* Slides 32-33
 ```{r }
 #library(ggplot2)
 er_F   <- 0.05   # Expected Returns
@@ -126,7 +129,7 @@ tab$var_p <-  tab$wF^2*var_F +tab$wT^2*var_T +2* tab$wF *(1 - tab$wF)*cov_FT
 ggplot() + geom_point(data = tab,
                       aes(x = var_p, y = er_p, color = wF)) +
     theme_bw() +
-    ggtitle("Possible....") +
+    ggtitle("Possible Portfolios with Negative Covariance") +
     xlab("Volatility") +
     ylab("Expected Returns")
 ```
