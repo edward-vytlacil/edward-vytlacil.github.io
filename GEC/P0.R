@@ -1,8 +1,8 @@
 # P0.R
 # R-script for PS0 for GEC
 ## Installing R handout:   https://edward-vytlacil.github.io/GEC/Install_R.pdf
-## Problem set 0: 
-## Review Lecture Slides:
+## Problem set 0: https://edward-vytlacil.github.io/GEC/PS0_summer_2023.pdf
+## Review Lecture Slides: https://edward-vytlacil.github.io/GEC/Review_Lecture.pdf
 ## Handout rules for expected value, variance: https://edward-vytlacil.github.io/GEC/Handout_Review_Rules_Exp_Var_Summer_2023.pdf
 
 library(ggplot2, quietly = TRUE) # need to install package if not already installed
