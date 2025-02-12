@@ -1,0 +1,1526 @@
+---
+title: "Monte Carlo Simulations and LLN"
+subtitle: "Edward Vytlacil"
+format:
+  revealjs: 
+    self-contained: true
+    footnotes-hover: true
+    scrollable: true
+    theme: dark
+    slide-number: true
+#    chalkboard: 
+#      buttons: false
+    preview-links: auto
+#    code-link: true
+#    css: styles.css
+    footer: "Econ 551"
+    mermaid:
+      theme: forest
+---
+
+```{r setup, include=FALSE}
+rm(list = ls())
+knitr::opts_chunk$set(echo = TRUE)
+library(stargazer, quietly=TRUE)
+library(ggplot2, quietly = TRUE)
+library(plotly)
+library(scales) # for colors of figures
+```
+
+## Monte Carlo Simulations
+
+[Monte Carlo Analysis](https://en.wikipedia.org/wiki/Monte_Carlo_method){preview-link="true"} (for this course)
+
+-   Use computer simulation to stochastically approximate some expected value.
+    -   Since expected value of an indicator variable is a probability, same method includes stochastically approximating probabilty of some event.
+    -   Relies critically on the *Law of Large Numbers*.
+
+## Monte Carlo Simulations
+
+[Monte Carlo Analysis](https://en.wikipedia.org/wiki/Monte_Carlo_method){preview-link="true"} (for this course)
+
+-   Use computer simulation to stochastically approximate some expected value.
+    -   Use when deriving an exact solution is difficult or infeasible.
+    -   Also sometimes used to corroborate analytical analysis.
+    -   Often not computationally efficient.
+
+## Monte Carlo Simulations
+
+MC simulations used to:
+
+-   Simulate expected payoff from some strategy;
+-   Study properties of estimators and inference procedures;
+-   Study quality of asymptotic approximations . . .
+
+## Monte Carlo Simulations
+
+MC simulations used to:
+
+-   Implement some inference procedures
+    -   e.g., bootstrap inference;
+-   Implement some estimation procedures
+    -   for example, creation of *training* and *test samples* in machine learning.
+ 
+## *pass line* bet in [craps](https://en.wikipedia.org/wiki/Craps){preview-link="true"}
+
+::: columns
+::: {.column width="65%"}
+-   Shooter rolls two dice,
+
+-   If sum of dice is 7 or 11, shooter wins,
+
+-   If sum of dice is 2, 3, or 12, casino wins,
+:::
+
+::: {.column width="2%"}
+:::
+
+::: {.column width="33%"}
+<!-- ![](figs/craps.png) -->
+:::
+:::
+
+-   Otherwise, shooter keeps rolling, until roll same sum as original sum (shooter wins) or sum is 7 (casino wins).
+
+What is the probability that shooter wins?
+
+::: aside
+<small> [Image](https://upload.wikimedia.org/wikipedia/commons/a/a3/Marines_and_sailors_attended_5th_annual_Casino_Royale_event_130928-M-WI309-003.jpg) by Pfc. Dalton Precht, Public domain, via Wikimedia Commons.</small>
+:::
+
+## Flowchart for Craps
+
+```{mermaid }
+flowchart LR
+D -->|   No  | F(  Roll <br> Again  )
+subgraph  Roll Again 
+F(Roll Again  ) --> G[Roll     7?  ]  
+  G -->|Yes  | H{  Lose  }
+  G -->|No  | I[Roll = <br>    1st   roll? ]
+  I -->|Yes  | J{  Win  }
+  I -->|No | F
+  end
+  subgraph 1st Roll 
+  A( Roll <br> Dice  ) --> B[  Roll <br>   7 or 11?  ]
+  B -->|  Yes  | C{  Win  }
+  B -->|  No  | D[  Roll 2 <br>    3   or 12?  ]
+  D -->|  Yes  | E{  Lose  }
+end
+
+```
+
+## *pass line* bet in [craps](https://en.wikipedia.org/wiki/Craps){preview-link="true"}
+
+-   In this example, could use probability theory to derive that the probability of winning is $244/495 \approx 0.4929$.
+
+-   Not feasible to derive solution in many examples.
+
+## Win on first roll
+
+-   Let's start with simpler problem:\
+    what is the probability that shooter wins on first roll?
+
+    -   Can derive that probability equals $2/9 \approx 0.2222$
+
+    -   Now we use Monte Carlo simulation to approximate that probability.
+
+## Rolling a Die
+
+-   First step: simulating one roll of a die:
+
+    -   R code: `sample(1:6,1)` which randomly drawing an element from {1,2,3,4,5,6}, each element equally likely, one time.
+
+```{r}
+#| output-location: column
+sample(1:6,1)
+```
+
+## Rolling a Die
+
+-   Rolls are random, each time can get different results:
+
+```{r}
+#| output-location: column
+sample(1:6,1)
+```
+
+. . .
+
+```{r}
+#| output-location: column
+sample(1:6,1)
+```
+
+. . .
+
+```{r}
+#| output-location: column
+sample(1:6,1)
+```
+
+. . .
+
+```{r}
+#| output-location: column
+sample(1:6,1)
+```
+
+<!-- . . . -->
+
+<!-- ```{r} -->
+
+<!-- #| output-location: column -->
+
+<!-- sample(1:6,10,replace=TRUE) -->
+
+<!-- ``` -->
+
+<!-- . . . -->
+
+<!-- ```{r} -->
+
+<!-- #| output-location: column -->
+
+<!-- sample(1:6,10,replace=TRUE) -->
+
+<!-- ``` -->
+
+<!-- . . . -->
+
+<!-- ```{r} -->
+
+<!-- #| output-location: column -->
+
+<!-- sample(1:6,10,replace=TRUE) -->
+
+<!-- ``` -->
+
+<!-- . . . -->
+
+<!-- ```{r} -->
+
+<!-- #| output-location: column -->
+
+<!-- sample(1:6,10,replace=TRUE) -->
+
+<!-- ``` -->
+
+## Are results really random?
+
+-   Computers are deterministic.
+
+    -   To create truly random numbers, can use a physical process, e.g., from nuclear decay of radioisotopes.
+
+    -   Not necessary for our purposes, and not what **R** is doing...
+
+    -   R is generating *pseudo-random numbers*
+
+## R generating *pseudo-random numbers*
+
+-   R is generating *pseudo-random numbers*
+
+    -   starting point is a *seed*, in **R** determined by default by computer's real time clock (time to the nanosecond that you run process), along with process ID number;
+    -   algorithm applied to *seed* to obtain *pseudo-random* numbers.
+    -   not actually random, as deterministic given seed, but close enough to random for our purposes.
+
+## Replication?
+
+-   You may obtain different pseudo-random numbers each time you run your code, neither you nor others can replicate your results.
+
+-   For replication purposes, can `set.seed`
+
+::: columns
+::: {.column width="48%"}
+```{r}
+#| output: false
+set.seed(551)
+sample(1:6,1)
+sample(1:6,1)
+sample(1:6,1)
+```
+:::
+
+::: {.column width="4%"}
+:::
+
+::: {.column width="48%"}
+```{r}
+#| echo: false
+#| output: true
+set.seed(551)
+sample(1:6,1)
+sample(1:6,1)
+sample(1:6,1)
+```
+:::
+:::
+
+. . .
+
+::: columns
+::: {.column width="48%"}
+```{r}
+#| output: false
+set.seed(551)
+sample(1:6,1)
+sample(1:6,1)
+sample(1:6,1)
+```
+:::
+
+::: {.column width="4%"}
+:::
+
+::: {.column width="48%"}
+```{r}
+#| echo: false
+#| output: true
+set.seed(551)
+sample(1:6,1)
+sample(1:6,1)
+sample(1:6,1)
+```
+:::
+:::
+
+## Rolling Two Dice
+
+-   Now simulating rolling two dice:
+
+    -   `sample(1:6,2,replace=TRUE)` randomly draws one element from {1,2,3,4,5,6}, each element equally likely, *with replacement*, two times.
+
+```{r}
+#| output-location: column
+set.seed(551)
+sample(1:6,2,replace=TRUE)
+```
+
+. . .
+
+-   Sum the two dice
+
+```{r}
+#| output-location: column
+set.seed(551)
+sum(sample(1:6,2,replace=TRUE))
+```
+
+## Approximate Prob. Win on 1st Roll
+
+-   Shooter wins on first roll if sum of dice is 7 or 11.
+
+-   How to approximate probability winning first roll?
+
+-   Simulate many rolls, find what fraction of rolls results in a sum of 7 or an 11.
+
+## Approximate Prob. Win on 1st Roll
+
+-   More formally
+    -   Let $X$ denote indicator variable for winning on first roll.
+    -   Let $p = \Pr[X=1]$, probability win.
+    -   Let $X_1, . . . ,X_B$ denote $B$ independent replications of $X$.
+    -   Let $\bar{X}_B$ sample mean, i.e., fraction of replications with $X_i = 1$.
+    -   Use $\bar{X}_B$ to approximate $\mathbb{E}[X]=\Pr[X=1]$.
+
+## Win first roll
+
+-   One simulation of whether win on first roll:
+
+```{r}
+sum(sample(1:6,2,replace=TRUE)) %in% c(7, 11) 
+```
+
+## Approximate Prob. Win on 1st Roll
+
+-   Replicate that simulation 10 times
+
+```{r}
+#| echo: false
+#| output: falase
+set.seed(551)
+sims <- replicate(10,sum(sample(1:6,2,replace=TRUE)) %in% c(7, 11) )
+```
+
+```{r}
+set.seed(551)
+replicate(10,sum(sample(1:6,2,replace=TRUE)) %in% c(7, 11) )
+```
+
+. . .
+
+-   Compute fraction of replications where win:
+
+```{r}
+#| echo: true
+set.seed(551)
+mean(replicate(10,sum(sample(1:6,2,replace=TRUE)) %in% c(7, 11) ))
+```
+
+-   Use `r mean(sims)` to approximate probability win first roll.
+
+## Approximate Prob. Win on 1st Roll
+
+-   True probability win on first roll: $2/9 \approx 0.222$.
+
+-   Fraction of 10 simulations where won: `r mean(sims)`.
+
+    -   Not a very good approximation.
+
+## Approximate Prob. Win on 1st Roll
+
+-   Additional problem:\
+    Can get very different approximation if rerun code:
+
+```{r}
+#| echo: true
+mean(replicate(10,sum(sample(1:6,2,replace=TRUE)) %in% c(7, 11) ))
+```
+
+. . .
+
+```{r}
+#| echo: true
+mean(replicate(10,sum(sample(1:6,2,replace=TRUE)) %in% c(7, 11) ))
+```
+
+. . .
+
+```{r}
+#| echo: true
+mean(replicate(10,sum(sample(1:6,2,replace=TRUE)) %in% c(7, 11) ))
+```
+
+. . .
+
+-   Note that $\mathbb{E}(\bar{X}_B)=p$, but $\mbox{Var}(\bar{X}_B)= p*(1-p)/B$.
+
+## Approximate Prob. Win on 1st Roll
+
+-   Additional problem:\
+    Can get very different approximation if rerun code:
+
+    -   Note that $\mathbb{E}(\bar{X}_B)=p$, but $\mbox{Var}(\bar{X}_B)= p*(1-p)/B$, where $p=2/9$.
+
+```{r}
+#| echo: false
+#| fig-align: center
+f_mean <- function(n,p){
+  temp<-data.frame(x=c(0:n)/n,y=dbinom(c(0:n),size=n,prob=p),
+                   xend=c(0:n)/n,yend=rep(0,n+1))
+  ggplot(temp,aes(x = x, y = y,xend = x, yend = yend)) +  xlab(substitute(bar(X)[j],list(j=n)))+ylab("Probability")+
+    geom_segment(colour="red") +ggtitle(paste0("PMF: Mean, ", n, " Replications"))+
+     scale_x_continuous(limits=c(0, 1),    breaks=seq(0, 1, by = .1) )+
+         scale_y_continuous(limits=c(0, .3), expand = c(0, 0))
+
+}
+
+f_mean(10,2/9)
+```
+
+## Stochastic Approximation:
+
+-   Consider increasing number of replications
+
+::: columns
+::: {.column width="80%"}
+```{r}
+#| output: false
+mean(replicate(100,sum(sample(1:6,2,replace=TRUE))
+               %in% c(7, 11) ))
+```
+:::
+
+::: {.column width="2%"}
+:::
+
+::: {.column width="18%"}
+```{r}
+#| echo: false
+#| output: true
+
+set.seed(551)
+mean(replicate(100,sum(sample(1:6,2,replace=TRUE)) 
+               %in% c(7, 11) ))
+```
+:::
+:::
+
+. . .
+
+::: columns
+::: {.column width="80%"}
+```{r}
+#| output: false
+mean(replicate(1000,sum(sample(1:6,2,replace=TRUE)) 
+               %in% c(7, 11) ))
+```
+:::
+
+::: {.column width="2%"}
+:::
+
+::: {.column width="18%"}
+```{r}
+#| echo: false
+#| output: true
+set.seed(551)
+mean(replicate(1000,sum(sample(1:6,2,replace=TRUE)) 
+               %in% c(7, 11) ))
+```
+:::
+:::
+
+. . .
+
+::: columns
+::: {.column width="80%"}
+```{r}
+#| output: false
+mean(replicate(10000,sum(sample(1:6,2,replace=TRUE))
+               %in% c(7, 11) ))
+```
+:::
+
+::: {.column width="2%"}
+:::
+
+::: {.column width="18%"}
+```{r}
+#| echo: false
+#| output: true
+set.seed(551)
+mean(replicate(10000,sum(sample(1:6,2,replace=TRUE)) %in% c(7, 11) ))
+```
+:::
+:::
+
+. . .
+
+::: columns
+::: {.column width="80%"}
+```{r}
+#| output: false
+mean(replicate(100000,sum(sample(1:6,2,replace=TRUE)) 
+               %in% c(7, 11) ))
+```
+:::
+
+::: {.column width="2%"}
+:::
+
+::: {.column width="18%"}
+```{r}
+#| echo: false
+#| output: true
+set.seed(551)
+mean(replicate(100000,sum(sample(1:6,2,replace=TRUE)) %in% c(7, 11) ))
+```
+:::
+:::
+
+## Stochastic Approximation:
+
+<!-- -   Plotting results for $n=1$ to $100$. -->
+
+-   Plotting results for $B=1$ to $=10000$.
+
+```{r}
+#| echo: false
+set.seed(551)
+
+f.roll = function(N) {
+
+  # create a random sample of n rolls
+  rolls = (replicate(N,sum(sample(1:6,2,replace=TRUE))) %in% c(7, 11) )
+  
+  # construct cumulative mean vector
+  cum_sum = cumsum(rolls)
+  index = c(1:N)
+  cum_mean = cum_sum / index
+  
+  # return (n, mean(X)_n) for
+  # n=1 to N, as data frame.
+  data.frame(index,cum_mean)
+}
+
+
+plot.toss = function(N,results) {
+
+  # plot the results together
+fig.1<-  ggplot(results, aes(x=index,y=cum_mean)) + scale_y_continuous(limits=c(0, 1))+
+    geom_line(colour = 'red') + scale_x_continuous(limits=c(0, N), expand = c(0, 0))+
+    geom_abline(intercept=2/9,slope=0, color = 'black', size=.5) +      
+    theme(plot.title = element_text(size=rel(1.5)),
+          panel.background = element_rect()) +
+    labs(x = "B (number of replications)", 
+         y = "Cumulative Average")  
+fig.1
+}  
+
+results <- f.roll(10000)
+fig.1<- plot.toss(10000,results)
+fig.1
+```
+
+## Stochastic Approximation:
+
+-   What happens if repeat this MC simulation?
+
+```{r}
+#| echo: false
+
+
+f.roll2 = function(N,R) {
+
+  # create R random samples of N rolls
+  rolls = replicate(R,replicate(N,sum(sample(1:6,2,replace=TRUE))) %in% c(7, 11) )
+
+  # construct cumulative mean vector
+  index = c(1:N)
+  cum_sum = sapply(1:R,function(j){cumsum(rolls[,j])})
+  cum_mean = cum_sum / index
+  
+  data.frame(index,cum_mean)
+}
+
+
+
+results2 <- f.roll2(10000,1000) 
+df.temp <- results2[ ,c(1:2)]
+colnames(df.temp)<- names(results)
+fig.new <- fig.1 + geom_line(data=df.temp, aes(x=index,y=cum_mean), color = 'blue')
+
+fig.new
+ 
+```
+
+## Stochastic Approximation:
+
+-   What if we repeat this simulation 1,000 times?
+
+```{r}
+#| echo: false
+ 
+fig.new <- fig.1 + geom_line(data=df.temp, aes(x=index,y=cum_mean), color = 'blue',alpha=.2)
+hex <- hue_pal()(998)
+
+for (x in 3:1000) {
+df.temp <- results2[1:10000,c(1,x)]
+colnames(df.temp)<- names(results)
+fig.new <- fig.new + geom_line(data=df.temp, aes(x=index,y=cum_mean), color = hex[x-2],alpha=0.2)
+}
+fig.new
+```
+
+## Stochastic Approximation:
+
+```{r}
+#| layout-ncol: 2
+#| echo: false
+
+f_mean2 <- function(n,p){
+  temp<-data.frame(x=c(0:n)/n,y=dbinom(c(0:n),size=n,prob=p),
+                   xend=c(0:n)/n,yend=rep(0,n+1))
+  ggplot(temp,aes(x = x, y = y,xend = x, yend = yend)) +  xlab(substitute(bar(X)[j],list(j=n)))+ylab("Probability")+
+    geom_segment(colour="red") +ggtitle(paste0("PMF: Mean, ", n, " Replications"))+
+     scale_x_continuous(limits=c(0, 1),    breaks=seq(0, 1, by = .1) ) 
+ 
+}
+
+
+f_mean2(100,2/9)
+f_mean2(1000,2/9)
+f_mean2(10000,2/9)
+f_mean2(100000,2/9)
+```
+
+## Use Theory to Understand?
+
+-   Recall Convergence in Probability
+
+    -   We say a sequence $\bar{X}_B$ converges in probability to $\mu$, written $\bar{X}_B \stackrel{p}{\rightarrow} \mu$, if, for every $\epsilon>0$, $$ \lim_{B \rightarrow \infty} \Pr[ | \bar{X}_B - \mu | \ge \epsilon] = 0.$$
+
+## Law of Large Numbers
+
+-   Recall LLN for i.i.d. data.
+
+    -   Let $X_1, . . . , X_B$ denote i.i.d. random variables, with $\mathbb{E}[X_i]=\mu,$ finite. Then $\bar{X}_B \stackrel{p}{\rightarrow} \mu$.
+
+-   When $X_i$ an indicator variable, $\mathbb{E}[X_i]=p$ with $0 \le p \le 1$, so $\mathbb{E}[X_i]=\mu$ always exists, finite. Thus, by LLN, $\bar{X}_B \stackrel{p}{\rightarrow} p$, i.e., $\bar{X}_B$ approximates $p$ arbitrarily well for $B$ sufficiently large.
+
+<!-- ## Back to Simulating Pass Line Bet -->
+
+<!-- ```{r} -->
+
+<!-- craps.verbose <- function(){ -->
+
+<!--     sum0 <- sum(sample(1:6,2,replace=TRUE)) -->
+
+<!--     print(paste0("Shooter Rolls a ",sum0)) -->
+
+<!--     if (sum0  %in% c(7, 11)){ -->
+
+<!--             print("Shooter Wins on first roll!")  -->
+
+<!--             Win <- 1 -->
+
+<!--     } else if (sum0 %in% c(2, 3, 12)){ -->
+
+<!--             print("Casino Wins on first roll!")  -->
+
+<!--             Win <- 0  -->
+
+<!--     } else{ -->
+
+<!--       while(TRUE){ -->
+
+<!--         sum1 <- sum(sample(1:6,2,replace=TRUE)) -->
+
+<!--         print(paste0("Shooter Rolls a ",sum1)) -->
+
+<!--         if (sum1 == sum0){ -->
+
+<!--                     Win <- 1 -->
+
+<!--                     print("Shooter Wins!")  -->
+
+<!--                     break -->
+
+<!--         } else if (sum1 == 7){ -->
+
+<!--                     print("Casino Wins!")  -->
+
+<!--                     Win <- 0 -->
+
+<!--                     break -->
+
+<!--                 } -->
+
+<!--       } -->
+
+<!--     } -->
+
+<!--     return(Win) -->
+
+<!--             } -->
+
+<!-- craps.verbose()   -->
+
+<!-- ``` -->
+
+## Original Problem
+
+-   What is the probability that shooter wins *pass line* bet in [craps](https://en.wikipedia.org/wiki/Craps){preview-link="true"}?
+
+-   First write function to simulate pass line bet.
+
+## Flowchart for Craps
+
+```{mermaid }
+flowchart LR
+D -->|  No  | F(  Roll <br> Again  )
+subgraph  Roll Again 
+F(Roll Again  ) --> G[Roll     7?  ]  
+  G -->|Yes  | H{  Lose  }
+  G -->|No  | I[Roll = <br>    1st   roll? ]
+  I -->|Yes  | J{  Win  }
+  I -->|No | F
+  end
+  subgraph 1st Roll 
+  A( Roll <br> Dice  ) --> B[  Roll <br>   7 or 11?  ]
+  B -->|  Yes  | C{  Win  }
+  B -->|  No  | D[  Roll 2 <br>    3   or 12?  ]
+  D -->|  Yes  | E{  Lose  }
+end
+
+```
+
+<!-- ## Function to simulate pass line bet -->
+
+```{r}
+#| echo: false
+
+f.craps  <- function(){
+    sum0 <- sum(sample(1:6,2,replace=TRUE))
+     if (sum0  %in% c(7, 11)){
+             Win <- 1
+    } else if (sum0 %in% c(2, 3, 12)){
+             Win <- 0
+    } else{
+      while(TRUE){
+        sum1 <- sum(sample(1:6,2,replace=TRUE))
+         if (sum1 == sum0){
+                    Win <- 1
+                     break
+        } else if (sum1 == 7){
+                     Win <- 0
+                    break
+                }
+      }
+    }
+    return(Win)
+            }
+```
+
+## Function to simulate pass line bet {auto-animate="true"}
+
+``` {.r code-line-numbers="1-7"}
+f.craps <- function(){
+    # simulate first roll of dice
+    sum0 <- sum(sample(1:6,2,replace=TRUE))
+    # determine if win/lose on first roll
+    # determine outcome if don't win/lose on first roll
+    return(Win)
+}
+```
+
+## Function to simulate pass line bet {auto-animate="true"}
+
+``` {.r code-line-numbers="4-11"}
+f.craps <- function(){
+    # simulate first roll of dice
+    sum0 <- sum(sample(1:6,2,replace=TRUE))
+    # determine if win/lose on first roll
+    if (sum0  %in% c(7, 11)){
+             Win <- 1
+    } else if (sum0 %in% c(2, 3, 12)){
+             Win <- 0 
+    } else{
+    # determine outcome if don't win/lose on first roll
+    }
+    return(Win)
+}
+```
+
+## Function to simulate pass line bet {auto-animate="true"}
+
+``` {.r code-line-numbers="10-13"}
+f.craps <- function(){
+    # simulate first roll of dice
+    sum0 <- sum(sample(1:6,2,replace=TRUE))
+    # determine if win/lose on first roll
+    if (sum0  %in% c(7, 11)){
+             Win <- 1
+    } else if (sum0 %in% c(2, 3, 12)){
+             Win <- 0 
+    } else{
+    # determine outcome if don't win/lose on first roll
+    while(TRUE){
+    # keep rolling until someone wins
+    }
+    }
+    return(Win)
+}
+```
+
+## Function to simulate pass line bet {auto-animate="true"}
+
+``` {.r code-line-numbers="10-21|23"}
+f.craps <- function(){
+    # simulate first roll of dice
+    sum0 <- sum(sample(1:6,2,replace=TRUE))
+    # determine if win/lose on first roll
+    if (sum0  %in% c(7, 11)){
+            Win <- 1
+    } else if (sum0 %in% c(2, 3, 12)){
+            Win <- 0 
+    } else{
+    # determine outcome if don't win/lose on first roll
+    while(TRUE){
+    # keep rolling until someone wins
+      sum1 <- sum(sample(1:6,2,replace=TRUE))
+      if (sum1 == sum0){
+            Win <- 1
+            break
+        } else if (sum1 == 7){
+            Win <- 0
+            break
+        }
+    }
+    }
+    return(Win)
+}
+```
+
+## Simulate Prob Win Pass Line Bet {auto-animate="true"}
+
+```{r}
+
+sim.prob <- mean(replicate(100000,f.craps()))
+sim.prob 
+```
+
+-   MC simulated probabilty: `r sim.prob`
+-   True prob: - $244/495 \approx 0.4929$.
+
+## Can draw from . . . {.smaller}
+
+-   Common distributions in **R**:
+
+    | Distribution | Function               | Returns                                                   |
+    |----------------------|----------------------------|----------------------|
+    | Binomial     | `rbinom(n,size,prob)`  | draw $n$ times from $\mbox{Binom}(\mbox{size},p).$        |
+    | Normal       | `rnorm(n,mean=0,sd=1)` | draw $n$ times from $N(\mbox{mean},\mbox{sd})$            |
+    | Student-t    | `rt(n,df)`             | draw $n$ times from $t_{df}$ distribution.                |
+    | Uniform      | `runif(n,min=0,max=1)` | draw $n$ times from $\mbox{Unif}[\mbox{min},\mbox{max}]$. |
+
+## General Procedure
+
+From some function $f$ ,
+
+-   Let $X$ denote random variable (or random vector).
+
+-   Let $X_1, . . . ,X_B$ denote $RB replications of $X$.
+
+-   Construct $f(X_1), . . . ,f(X_B)$.
+
+-   Let $\overline{f(X)}_B$ sample mean of $f(X_j)$ across $B$ replications.
+
+-   Use $\overline{f(X)}_B$ to approximate $\mathbb{E}[f(X)]$.
+
+::: aside
+Procedure will be consistent as long as $\mathbb{E}[f(X)]$ exists and is finite.
+:::
+
+## Examples:
+
+-   Approximate $\mathbb{E}[X]$ for $X \sim N(0,1)$.
+
+::: columns
+::: {.column width="80%"}
+```{r}
+#| output: false
+mean(rnorm(100000))
+```
+:::
+
+::: {.column width="2%"}
+:::
+
+::: {.column width="18%"}
+```{r}
+#| echo: false
+#| output: true
+mean(rnorm(100000))
+```
+:::
+:::
+
+. . .
+
+-   Approximate $\mathbb{E}[\max\{0,X\}]$ for $X \sim N(0,1)$.
+
+::: columns
+::: {.column width="80%"}
+```{r}
+#| output: false
+f.1 <- function(x){max(0,x)} 
+mean(replicate(100000,f.1(rnorm(1))))
+```
+:::
+
+::: {.column width="2%"}
+:::
+
+::: {.column width="18%"}
+```{r}
+#| echo: false
+#| output: true
+mean(replicate(100000,f.1(rnorm(1))))
+```
+:::
+:::
+
+## Examples:
+
+-   Approximate $\Pr[-0.1.96< X < 1.96]$ for $X \sim$ Cauchy.
+
+::: columns
+::: {.column width="80%"}
+```{r}
+#| output: false
+# mean of 10000 replications
+f.2 <- function(x){(-1.96 <x & x<1.96)} 
+mean(replicate(100000,f.2(rcauchy(1))))
+```
+:::
+
+::: {.column width="2%"}
+:::
+
+
+::: {.column width="18%"}
+```{r}
+#| echo: false
+#| output: true
+mean(replicate(100000,f.2(rcauchy(1))))
+```
+:::
+:::
+
+
+. . .
+
+-   Why is it a bad idea to approximate $\mathbb{E}[X]$ for $X \sim$ Cauchy.
+
+::: columns
+::: {.column width="80%"}
+```{r}
+#| output: false
+# mean of 10000 replications
+ mean(rcauchy(100000))
+```
+:::
+
+::: {.column width="2%"}
+:::
+
+::: {.column width="18%"}
+```{r}
+#| echo: false
+# mean of 10000 replications
+ mean(rcauchy(100000))
+```
+:::
+:::
+
+## Often Replicating Samples. . . {.smaller}
+
+-   Often sampling $X$ where $X$ itself is determined by underlying sample.
+
+-   For example, consider simulating mean of $N$ weighted coin flips, i.e., $X=\bar{Y}_N$ were $Y_N = \frac{1}{N}\sum_i Y_i, ~ Y_i \sim \mbox{Bernoulli}(p)$.
+
+    -   creating $B$ replication samples, each replication sample of $N$ coin flips, $(Y_{b,1},Y_{b,2},...,Y_{b,N})$ for $b=1$ to $B$.
+
+    -   Let $X_b = \bar{Y}_{b,N}$, sample mean of $N$ weighted coin flips on replication sample $b$.
+
+-   proceed as before.
+
+Note two dimensions, $N$ (size of each sample) and $B$ (number of replications).
+
+## Examples:
+
+Let $\bar{Y}_{N}$ be the mean of $N$ weighted coin flips with $\Pr[Y_i=1]=p_0$. Consider:
+
+-   Size of $\alpha=0.05$ level test of $H_0: p=p_0$ vs two-sided alternative, using t-test based on asymptotic normality.
+
+-   Power of that test against $p \ne p_0$.
+
+
+
+## Examples:
+
+Let $\bar{Y}_{10}$ be the mean of $10$  fair  coin flips. Using $100,000$ replications,
+
+-   approximate $\Pr\left[~ \left | \sqrt{10} \frac{\bar{Y}_{10} -0.5}{\sqrt{\bar{Y}_{10} * (1-\bar{Y}_{10})}} \right | > 1.96\right]$
+
+::: columns
+::: {.column width="80%"}
+```{r}
+#| output: false
+f.tstat0 <- function(n){
+  phat <- mean(rbinom(n,1,p=0.5))
+  sqrt(n)*(phat - 0.5)/sqrt(phat * (1-phat))
+}
+
+mean(replicate(100000,abs(f.tstat0(10))>1.96))
+```
+:::
+
+::: {.column width="2%"}
+:::
+
+::: {.column width="18%"}
+```{r}
+#| echo: false
+#| output: true
+f.tstat0 <- function(n){
+  phat <- mean(rbinom(n,1,p=0.5))
+  sqrt(n)*(phat - 0.5)/sqrt(phat * (1-phat))
+}
+  
+mean(replicate(100000,abs(f.tstat0(10))>1.96))
+```
+:::
+:::
+
+## Examples:
+
+Let $\bar{Y}_{100}$ be the mean of $100$ fair  coin flips. Using $100,000$ replications,
+
+-   approximate $\Pr\left[~ \left | \sqrt{100} \frac{\bar{Y}_{100} -0.5}{\sqrt{\bar{Y}_{100} * (1-\bar{Y}_{100})}} \right | > 1.96\right]$
+
+::: columns
+::: {.column width="80%"}
+```{r}
+#| output: false
+f.tstat0 <- function(n){
+  phat <- mean(rbinom(n,1,p=0.5))
+  sqrt(n)*(phat - 0.5)/sqrt(phat * (1-phat))
+}
+  
+mean(replicate(100000,abs(f.tstat0(100))>1.96))
+```
+:::
+
+::: {.column width="2%"}
+:::
+
+::: {.column width="18%"}
+```{r}
+#| echo: false
+#| output: true
+f.tstat0 <- function(n){
+  phat <- mean(rbinom(n,1,p=0.5))
+  sqrt(n)*(phat - 0.5)/sqrt(phat * (1-phat))
+}
+  
+mean(replicate(100000,abs(f.tstat0(100))>1.96))
+```
+:::
+:::
+
+## Examples:
+
+Let $\bar{Y}_{1000}$ be the mean of $1000$ fair  coin flips. Using $100,000$ replications,
+
+-   approximate $\Pr\left[~ \left | \sqrt{1000} \frac{\bar{Y}_{1000} -0.5}{\sqrt{\bar{Y}_{1000} * (1-\bar{Y}_{1000})}} \right | > 1.96\right]$
+
+::: columns
+::: {.column width="80%"}
+```{r}
+#| output: false
+f.tstat0 <- function(n){
+  phat <- mean(rbinom(n,1,p=0.5))
+  sqrt(n)*(phat - 0.5)/sqrt(phat * (1-phat))
+}
+  
+mean(replicate(100000,abs(f.tstat0(1000))>1.96))
+```
+:::
+
+::: {.column width="2%"}
+:::
+
+::: {.column width="18%"}
+```{r}
+#| echo: false
+#| output: true
+f.tstat0 <- function(n){
+  phat <- mean(rbinom(n,1,p=0.5))
+  sqrt(n)*(phat - 0.5)/sqrt(phat * (1-phat))
+}
+  
+mean(replicate(100000,abs(f.tstat0(1000))>1.96))
+```
+:::
+:::
+
+## Examples:
+
+Let $\bar{Y}_{10}$ be the mean of $10$  weighted  coin flips with $p=0.01$. Using $100,000$ replications,
+
+-   approximate $\Pr\left[~ \left | \sqrt{10} \frac{\bar{Y}_{10} -0.01}{\sqrt{\bar{Y}_{10} * (1-\bar{Y}_{10})}} \right | > 1.96\right]$
+
+::: columns
+::: {.column width="80%"}
+```{r}
+#| output: false
+f.tstat0 <- function(n){
+  phat <- mean(rbinom(n,1,p=0.01))
+  sqrt(n)*(phat - 0.01)/sqrt(phat * (1-phat))
+}
+  
+mean(replicate(100000,abs(f.tstat0(10))>1.96))
+```
+:::
+
+::: {.column width="2%"}
+:::
+
+::: {.column width="18%"}
+```{r}
+#| echo: false
+#| output: true
+f.tstat0 <- function(n){
+  phat <- mean(rbinom(n,1,p=0.01))
+  sqrt(n)*(phat - 0.01)/sqrt(phat * (1-phat))
+}
+  
+mean(replicate(100000,abs(f.tstat0(10))>1.96))
+```
+:::
+:::
+
+## Examples:
+
+Let $\bar{Y}_{100}$ be the mean of $100$ weighted  coin flips with $p=0.01$. Using $100,000$ replications,
+
+-   approximate $\Pr\left[~ \left | \sqrt{100} \frac{\bar{Y}_{100} -0.01}{\sqrt{\bar{Y}_{100} * (1-\bar{Y}_{100})}} \right | > 1.96\right]$
+
+::: columns
+::: {.column width="80%"}
+```{r}
+#| output: false
+f.tstat0 <- function(n){
+  phat <- mean(rbinom(n,1,p=0.01))
+  sqrt(n)*(phat - 0.01)/sqrt(phat * (1-phat))
+}
+  
+mean(replicate(100000,abs(f.tstat0(100))>1.96))
+```
+:::
+
+::: {.column width="2%"}
+:::
+
+::: {.column width="18%"}
+```{r}
+#| echo: false
+#| output: true
+f.tstat0 <- function(n){
+  phat <- mean(rbinom(n,1,p=0.01))
+  sqrt(n)*(phat - 0.01)/sqrt(phat * (1-phat))
+}
+
+mean(replicate(100000,abs(f.tstat0(100))>1.96))
+```
+:::
+:::
+
+## Examples:
+
+Let $\bar{Y}_{1000}$ be the mean of $1000$ weighted  coin flips with $p=0.01$. Using $100,000$ replications,
+
+-   approximate $\Pr\left[~ \left | \sqrt{1000} \frac{\bar{Y}_{1000} -0.01}{\sqrt{\bar{Y}_{1000} * (1-\bar{Y}_{1000})}} \right | > 1.96\right]$
+
+::: columns
+::: {.column width="80%"}
+```{r}
+#| output: false
+f.tstat0 <- function(n){
+  phat <- mean(rbinom(n,1,p=0.01))
+  sqrt(n)*(phat - 0.01)/sqrt(phat * (1-phat))
+}
+  
+mean(replicate(100000,abs(f.tstat0(1000))>1.96))
+```
+:::
+
+::: {.column width="2%"}
+:::
+
+::: {.column width="18%"}
+```{r}
+#| echo: false
+#| output: true
+f.tstat0 <- function(n){
+  phat <- mean(rbinom(n,1,p=0.01))
+  sqrt(n)*(phat - 0.01)/sqrt(phat * (1-phat))
+}
+  
+mean(replicate(100000,abs(f.tstat0(1000))>1.96))
+```
+:::
+:::
+
+
+
+## Examples:
+
+Now consider test statistic for null $p_0=0.5$ when true  $p=0.4$.  Suppose $N=10$. Using $100,000$ replications,
+
+-   approximate $\Pr\left[~ \left | \sqrt{10} \frac{\bar{Y}_{10} -0.5}{\sqrt{\bar{Y}_{10} * (1-\bar{Y}_{10})}} \right | > 1.96\right]$ 
+
+::: columns
+::: {.column width="80%"}
+```{r}
+#| output: false
+f.tstat0 <- function(n){
+  phat <- mean(rbinom(n,1,p=0.4))
+  sqrt(n)*(phat - 0.5)/sqrt(phat * (1-phat))
+}
+  
+mean(replicate(100000,abs(f.tstat0(10))>1.96))
+```
+:::
+
+::: {.column width="2%"}
+:::
+
+::: {.column width="18%"}
+```{r}
+#| echo: false
+#| output: true
+f.tstat0 <- function(n){
+  phat <- mean(rbinom(n,1,p=0.4))
+  sqrt(n)*(phat - 0.5)/sqrt(phat * (1-phat))
+}
+  
+mean(replicate(100000,abs(f.tstat0(10))>1.96))
+```
+:::
+:::
+
+## Examples:
+
+Now consider test statistic for null $p=0.5$ when true  $p=0.4$.  Suppose $N=100$. Using $100,000$ replications,
+
+-   approximate $\Pr\left[~ \left | \sqrt{100} \frac{\bar{Y}_{100} -0.5}{\sqrt{\bar{Y}_{100} * (1-\bar{Y}_{100})}} \right | > 1.96\right]$ 
+
+::: columns
+::: {.column width="80%"}
+```{r}
+#| output: false
+f.tstat0 <- function(n){
+  phat <- mean(rbinom(n,1,p=0.4))
+  sqrt(n)*(phat - 0.5)/sqrt(phat * (1-phat))
+}
+  
+mean(replicate(100000,abs(f.tstat0(100))>1.96))
+```
+:::
+
+::: {.column width="2%"}
+:::
+
+::: {.column width="18%"}
+```{r}
+#| echo: false
+#| output: true
+f.tstat0 <- function(n){
+  phat <- mean(rbinom(n,1,p=0.4))
+  sqrt(n)*(phat - 0.5)/sqrt(phat * (1-phat))
+}
+
+mean(replicate(100000,abs(f.tstat0(100))>1.96))
+```
+:::
+:::
+
+## Examples:
+
+Now consider test statistic for null $p=0.5$ when true  $p=0.4$.  Suppose $N=1,000$. Using $100,000$ replications,
+
+-   approximate $\Pr\left[~ \left | \sqrt{1000} \frac{\bar{Y}_{1000} -0.5}{\sqrt{\bar{Y}_{1000} * (1-\bar{Y}_{1000})}} \right | > 1.96\right]$ 
+
+::: columns
+::: {.column width="80%"}
+```{r}
+#| output: false
+f.tstat0 <- function(n){
+  phat <- mean(rbinom(n,1,p=0.4))
+  sqrt(n)*(phat - 0.5)/sqrt(phat * (1-phat))
+}
+  
+mean(replicate(100000,abs(f.tstat0(1000))>1.96))
+```
+:::
+
+::: {.column width="2%"}
+:::
+
+::: {.column width="18%"}
+```{r}
+#| echo: false
+#| output: true
+f.tstat0 <- function(n){
+  phat <- mean(rbinom(n,1,p=0.4))
+  sqrt(n)*(phat - 0.5)/sqrt(phat * (1-phat))
+}
+  
+mean(replicate(100000,abs(f.tstat0(1000))>1.96))
+```
+:::
+:::
+
+
+## What if simulate sample mean of Cauchy?
+
+<!-- -   Plotting results for $n=1$ to $100$. -->
+
+-   Plotting results for $B=1$ to $=10000$.
+
+```{r}
+#| echo: false
+set.seed(551)
+
+f.c = function(N) {
+
+  # create a random sample of n rolls
+  draws.c <-   rcauchy(N)
+  
+  # construct cumulative mean vector
+  cum_sum = cumsum(draws.c)
+  index = c(1:N)
+  cum_mean = cum_sum / index
+  
+  # return (n, mean(X)_n) for
+  # n=1 to N, as data frame.
+  data.frame(index,cum_mean)
+}
+
+
+plot.c = function(N,results) {
+
+  # plot the results together
+fig.1<-  ggplot(results, aes(x=index,y=cum_mean))  + scale_y_continuous(limits=c(-5, 5))+
+    geom_line(colour = 'red') + scale_x_continuous(limits=c(0, N), expand = c(0, 0))+
+    geom_abline(intercept=0,slope=0, color = 'black', size=.5) +      
+    theme(plot.title = element_text(size=rel(1.5)),
+          panel.background = element_rect()) +
+    labs(x = "B (number of replications)", 
+         y = "Cumulative Average")  
+fig.1
+}  
+
+results.c <- f.c(10000)
+fig.c<- plot.c(10000,results.c)
+fig.c
+```
+
+##  What if draw from Cauchy (2nd Replication)?
+
+-   What happens if repeat this MC simulation?
+
+```{r}
+#| echo: false
+
+
+f.c2 = function(N,R) {
+
+  # create R random samples of N rolls
+  draws.c <-   replicate(R,rcauchy(N))
+
+  # construct cumulative mean vector
+  index = c(1:N)
+  cum_sum = sapply(1:R,function(j){cumsum(draws.c[,j])})
+  cum_mean = cum_sum / index
+  
+  data.frame(index,cum_mean)
+}
+
+ 
+
+results.c2 <- f.c2(10000,1000) 
+df.temp <- results.c2[ ,c(1:2)]
+colnames(df.temp)<- names(results)
+fig.new.c2 <- fig.c + geom_line(data=df.temp, aes(x=index,y=cum_mean), color = 'blue')
+
+fig.new.c2
+ 
+```
+
+## Stochastic Approximation:
+
+-   What if we repeat this simulation 1,000 times?
+
+```{r}
+#| echo: false
+ 
+fig.new.c2 <- fig.c + geom_line(data=df.temp, aes(x=index,y=cum_mean), color = 'blue',alpha=.4)
+hex <- hue_pal()(998)
+
+for (x in 3:1000) {
+df.temp <- results.c2[1:10000,c(1,x)]
+colnames(df.temp)<- names(results)
+fig.new.c2 <- fig.new.c2 + geom_line(data=df.temp, aes(x=index,y=cum_mean), color = hex[x-2],alpha=0.4)
+}
+fig.new.c2
+```
+
+## Sample mean of a Cauchy
+
+-   Across 1,000 draws of $\bar{X}_{10,000}$, each mean based on a sample of $10,000$ i.i.d. Cauchy r.v.:
+
+::: columns
+::: {.column width="80%"}
+```{r}
+#| output: false
+draws.c <-   replicate(1000,mean(rcauchy(10000)))
+var(draws.c) 
+```
+:::
+
+::: {.column width="2%"}
+:::
+
+::: {.column width="18%"}
+```{r}
+#| echo: false
+#| output: true
+
+draws.c <-   replicate(1000,mean(rcauchy(10000)))
+var(draws.c)
+```
+:::
+:::
+
+
+
+::: columns
+::: {.column width="80%"}
+```{r}
+#| output: false
+min(draws.c)
+```
+:::
+
+::: {.column width="2%"}
+:::
+
+::: {.column width="18%"}
+```{r}
+#| echo: false
+#| output: true
+
+draws.c <-   replicate(1000,mean(rcauchy(10000)))
+min(draws.c)
+```
+:::
+:::
+
+
+
+::: columns
+::: {.column width="80%"}
+```{r}
+#| output: false
+max(draws.c)
+```
+:::
+
+::: {.column width="2%"}
+:::
+
+::: {.column width="18%"}
+```{r}
+#| echo: false
+#| output: true
+max(draws.c)
+```
+:::
+:::
+
+
+
+::: columns
+::: {.column width="80%"}
+```{r}
+#| output: false
+mean(draws.c>0)
+```
+:::
+
+::: {.column width="2%"}
+:::
+
+::: {.column width="18%"}
+```{r}
+#| echo: false
+#| output: true
+mean(draws.c>0)
+```
+:::
+:::
+
