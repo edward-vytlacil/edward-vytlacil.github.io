@@ -1621,14 +1621,14 @@ Coefficients:
 <h2></h2>
 <h3 id="recall-asymptotic-distribution-of-ols">Recall Asymptotic Distribution of OLS</h3>
 <p>Under regularity conditions,<br>
-<span class="math display">\[\sqrt{N} \left( \widehat \beta_N - \beta \right) \stackrel{d}{\rightarrow} Z,~~~Z \sim N(0,\Sigma),\]</span> which by CMT implies that, for any continuous function <span class="math inline">\(g\)</span>, <span class="math display">\[g(\sqrt{N} \left(  \widehat \beta_N -   \beta \right) \stackrel{d}{\rightarrow} g(Z),~~~Z \sim N(0,\Sigma),\]</span> and thus, for <span class="math inline">\(a\)</span> any <span class="math inline">\((K+1)\times 1\)</span> vector of constants, <span class="math display">\[\sqrt{N} \left( a^{\prime} \widehat \beta_N - a^{\prime} \beta \right) \stackrel{d}{\rightarrow} N(0, a^{\prime} \Sigma a).\]</span></p>
+<span class="math display">\[\sqrt{N} \left( \widehat \beta_N - \beta \right) \stackrel{d}{\rightarrow} Z,~~~Z \sim N(0,\Sigma),\]</span> which by CMT implies that, for any continuous function <span class="math inline">\(g\)</span>, <span class="math display">\[g\left(\sqrt{N} \left(  \widehat \beta_N -   \beta \right)\right) \stackrel{d}{\rightarrow} g(Z),~~~Z \sim N(0,\Sigma),\]</span> and thus, for <span class="math inline">\(a\)</span> any <span class="math inline">\((K+1)\times 1\)</span> vector of constants, <span class="math display">\[\sqrt{N} \left( a^{\prime} \widehat \beta_N - a^{\prime} \beta \right) \stackrel{d}{\rightarrow} N(0, a^{\prime} \Sigma a).\]</span></p>
 </section>
 <section id="section-22" class="slide level2">
 <h2></h2>
 <h3 id="standard-errors-for-linear-combination-of-beta">Standard Errors for Linear Combination of <span class="math inline">\(\beta\)</span></h3>
 <p><span class="math display">\[\sqrt{N} \left( a^{\prime} \widehat \beta_N - a^{\prime} \beta \right) \stackrel{d}{\rightarrow} N(0, a^{\prime} \Sigma a).\]</span></p>
 <ul>
-<li><p>Let <span class="math inline">\(\widehat \Sigma_N\)</span> denote a consistent estimator of <span class="math inline">\(\Sigma\)</span>, <span class="math display">\[\widehat \Sigma_N \stackrel{p}{\rightarrow} \Sigma ~~\Rightarrow ~~ a^{\prime} \widehat \Sigma_N a \stackrel{p}{\rightarrow} a^{\prime} \Sigma_N a.\]</span></p>
+<li><p>Let <span class="math inline">\(\widehat \Sigma_N\)</span> denote a consistent estimator of <span class="math inline">\(\Sigma\)</span>, <span class="math display">\[\widehat \Sigma_N \stackrel{p}{\rightarrow} \Sigma ~~\Rightarrow ~~ a^{\prime} \widehat \Sigma_N a \stackrel{p}{\rightarrow} a^{\prime} \Sigma a.\]</span></p>
 <p><span class="math display">\[
 \mbox{s.e.}(a^{\prime} \widehat \beta_N) = \widehat \omega_N / \sqrt{N} ~~\mbox{where}~~ \widehat \omega^2_N =  a^{\prime} \widehat \Sigma_N a
 \]</span></p></li>
@@ -1637,9 +1637,9 @@ Coefficients:
 <section id="section-23" class="slide level2">
 <h2></h2>
 <h3 id="test-null-for-linear-combination-of-beta.">Test Null for Linear Combination of <span class="math inline">\(\beta\)</span>.</h3>
-<p>Consider <span class="math display">\[H_0: \alpha^{\prime} \beta = \alpha^{\prime} b,~~~\mbox{vs}~~  H_1: \alpha^{\prime} \beta \ne \alpha^{\prime} b.\]</span></p>
+<p>Consider <span class="math display">\[H_0: a^{\prime} \beta = a^{\prime} b,~~~\mbox{vs}~~  H_1: a^{\prime} \beta \ne a^{\prime} b.\]</span></p>
 <ul>
-<li>Define test statistic: <span class="math display">\[T_N = \biggl | \frac{a^{\prime} \widehat \beta_N - a^{\prime} b}{\mbox{s.e.}(a^{\prime} \widehat \beta_N)} \biggr |.\]</span></li>
+<li>Define test statistic: <span class="math display">\[T_N =  \frac{a^{\prime} \widehat \beta_N - a^{\prime} b}{\mbox{s.e.}(a^{\prime} \widehat \beta_N)}  .\]</span></li>
 </ul>
 </section>
 <section id="section-24" class="slide level2">
@@ -1648,35 +1648,35 @@ Coefficients:
 <p><span class="math inline">\(T_N \stackrel{d}{\rightarrow} N(0,1)\)</span> under <span class="math inline">\(H_0\)</span>.</p>
 <p>For test at (asymptotic) level <span class="math inline">\(\alpha\)</span>,</p>
 <ul>
-<li><p>reject <span class="math inline">\(H_0\)</span> if <span class="math inline">\(T_N \ge c_{1-\alpha/2}\)</span> where <span class="math inline">\(c_{1-\alpha/2} = \Phi^{-1}(1-\alpha/2)\)</span>.</p></li>
-<li><p>equivalently, define <span class="math inline">\(p = 2 (1- \Phi(T_N))\)</span>, reject null if <span class="math inline">\(p \le \alpha\)</span>.</p></li>
+<li><p>reject <span class="math inline">\(H_0\)</span> if <span class="math inline">\(| T_N | \ge c_{1-\alpha/2}\)</span> where <span class="math inline">\(c_{1-\alpha/2} = \Phi^{-1}(1-\alpha/2)\)</span>.</p></li>
+<li><p>equivalently, define <span class="math inline">\(p = 2 (1- \Phi(| T_N| ))\)</span>, reject null if <span class="math inline">\(p \le \alpha\)</span>.</p></li>
 </ul>
 </section>
 <section id="section-25" class="slide level2">
 <h2></h2>
 <h3 id="ci-for-linear-combination-of-beta">CI for Linear Combination of <span class="math inline">\(\beta\)</span></h3>
-<p>Define <span class="math display">\[T_N(\alpha^{\prime} b) = \biggl | \frac{a^{\prime} \widehat \beta_N - a^{\prime} b}{\mbox{s.e.}(a^{\prime} \widehat \beta_N)} \biggr |.\]</span></p>
-<p>Invert (asymptotic) level <span class="math inline">\(\alpha\)</span> test to form <span class="math inline">\(1-\alpha\)</span> asymptotic CI: <span class="math display">\[ \widehat C_N   = \{\alpha^{\prime} b: T(\alpha^{\prime} b) \leq c_{1-\alpha/2}\} \\ = \left[ a^{\prime}  \widehat\beta_N - c_{1-\alpha/2} \times \mbox{s.e.}(a^{\prime} \widehat \beta_N), a^{\prime}  \widehat\beta_N + c_{1-\alpha/2} \times \mbox{s.e.}(a^{\prime} \widehat \beta_N) \right].\]</span></p>
+<p>Define <span class="math display">\[T_N(a^{\prime} b) =   \frac{a^{\prime} \widehat \beta_N - a^{\prime} b}{\mbox{s.e.}(a^{\prime} \widehat \beta_N)}  .\]</span></p>
+<p>Invert (asymptotic) level <span class="math inline">\(\alpha\)</span> test to form <span class="math inline">\(1-\alpha\)</span> asymptotic CI: <span class="math display">\[ \widehat C_N   = \left \{a^{\prime} b: | T_N(a^{\prime} b) |\leq c_{1-\alpha/2}\right \} \\ = \left[ a^{\prime}  \widehat\beta_N - c_{1-\alpha/2} \times \mbox{s.e.}(a^{\prime} \widehat \beta_N), ~a^{\prime}  \widehat\beta_N + c_{1-\alpha/2} \times \mbox{s.e.}(a^{\prime} \widehat \beta_N) \right].\]</span></p>
 </section>
 <section id="section-26" class="slide level2">
 <h2></h2>
 <h3 id="ci-for-linear-combination-of-beta-1">CI for Linear Combination of <span class="math inline">\(\beta\)</span></h3>
-<p><span class="math display">\[ \widehat C_N   = \{a^{\prime}  b: T(a^{\prime}  b) \leq c_{1-\alpha/2}\}\]</span></p>
-<p><span class="math display">\[\Rightarrow \Pr(a^{\prime}  \beta \in \widehat{C}_N) = \Pr(T_N(a^{\prime}  \beta) \leq c_{1-\alpha/2}) \rightarrow 1-\alpha,\]</span></p>
+<p><span class="math display">\[ \widehat C_N   = \left \{a^{\prime}  b: | T_N(a^{\prime}  b) |\leq c_{1-\alpha/2}\right \}\]</span></p>
+<p><span class="math display">\[\Rightarrow \Pr  \left (a^{\prime}  \beta \in \widehat{C}_N\right ) = \Pr\left (| T_N(a^{\prime}  \beta)| \leq c_{1-\alpha/2}\right) \rightarrow 1-\alpha,\]</span></p>
 <ul>
-<li>Thus <span class="math inline">\(\widehat C_N\)</span> is asymptotic <span class="math inline">\(1-\alpha\)</span> CI on <span class="math inline">\(\alpha^{\prime} \beta\)</span>.</li>
+<li>Thus <span class="math inline">\(\widehat C_N\)</span> is asymptotic <span class="math inline">\(1-\alpha\)</span> CI on <span class="math inline">\(a^{\prime} \beta\)</span>.</li>
 </ul>
 </section>
 <section id="section-27" class="slide level2">
 <h2></h2>
 <h3 id="ci-for-linear-combination-of-beta-2">CI for Linear Combination of <span class="math inline">\(\beta\)</span></h3>
-<p><span class="math display">\[ \widehat C_N   = \{a^{\prime}  b: T(a^{\prime}  b) \leq c_{1-\alpha/2}\}\]</span></p>
-<p><span class="math display">\[\Rightarrow \Pr(a^{\prime}  \beta \in \widehat{C}_N) = \Pr(T_N(a^{\prime}  \beta) \leq c_{1-\alpha/2}) \rightarrow 1-\alpha,\]</span></p>
+<p><span class="math display">\[ \widehat C_N   = \left \{a^{\prime}  b: |T_N(a^{\prime}  b) |\leq c_{1-\alpha/2}\right \}\]</span></p>
+<p><span class="math display">\[\Rightarrow \Pr\left (a^{\prime}  \beta \in \widehat{C}_N\right ) = \Pr\left (| T_N(a^{\prime}  \beta  ) | \leq c_{1-\alpha/2}\right) \rightarrow 1-\alpha,\]</span></p>
 <ul>
-<li><p>Can use <span class="math inline">\(\widehat C_N\)</span> to test null <span class="math inline">\(H_0: \alpha^{\prime} \beta = \alpha^{\prime} b\)</span> for any <span class="math inline">\(\alpha^{\prime} b\)</span>.</p>
+<li><p>Can use <span class="math inline">\(\widehat C_N\)</span> to test null <span class="math inline">\(H_0: a^{\prime} \beta = a^{\prime} b\)</span> for any <span class="math inline">\(a^{\prime} b\)</span>.</p>
 <ul>
-<li><p>Reject <span class="math inline">\(H_0: \alpha^{\prime} \beta = \alpha^{\prime} b\)</span> for any <span class="math inline">\(\alpha^{\prime} b \not \in \widehat{C}_N\)</span>.</p></li>
-<li><p>Fail to reject <span class="math inline">\(H_0: \alpha^{\prime} \beta = \alpha^{\prime} b\)</span> for any <span class="math inline">\(\alpha^{\prime} b \in \widehat{C}_N\)</span>.</p></li>
+<li><p>Reject <span class="math inline">\(H_0: a^{\prime} \beta = a^{\prime} b\)</span> for any <span class="math inline">\(a^{\prime} b \not \in \widehat{C}_N\)</span>.</p></li>
+<li><p>Fail to reject <span class="math inline">\(H_0: a^{\prime} \beta = a^{\prime} b\)</span> for any <span class="math inline">\(a^{\prime} b \in \widehat{C}_N\)</span>.</p></li>
 </ul></li>
 </ul>
 </section>
