@@ -1,0 +1,1634 @@
+---
+title: "Linear Regression Inference"
+subtitle: "Edward Vytlacil"
+#filters:
+format:
+  revealjs: 
+    self-contained: true
+    footnotes-hover: true
+    scrollable: true
+#    theme: dark
+    slide-number: true
+#    chalkboard: 
+#      buttons: true
+    preview-links: auto
+#    code-link: true
+#    css: styles.css
+#    bibliography: handouts.bib
+    footer: "Econ 5551"
+editor: 
+  markdown: 
+    wrap: 72
+---
+
+# Examples
+
+## 
+
+### Example 1: Progresa
+
+$$ Y_{i} = \beta_0 + \beta_1 \mbox{Treat}_i + \beta_2 \mbox{Girl}_i + \beta_3 \mbox{Treat}_i \times   \mbox{Girl}_i + \epsilon_i,$$
+
+where
+
+-   $Y_i$ is a dummy variable for school enrollment,
+-   $\mbox{Treat}_i$ is a dummy variable for receipt of Progresa,
+    assigned by RCT,
+-   $\mbox{Girl}_i$ is a dummy variable for being a girl.
+
+## 
+
+### Example 1: Progresa
+
+$$ Y_{i} = \beta_0 + \beta_1 \mbox{Treat}_i + \beta_2 \mbox{Girl}_i + \beta_3 \mbox{Treat}_i \times   \mbox{Girl}_i + \epsilon_i.$$
+
+Let
+
+-   $Y_{1i}$ denote potential outcome with treatment,
+
+-   $Y_{0i}$ potential outcome without treatment.
+
+How to interpret:
+
+-   $\beta$?
+-   $\epsilon_i$?
+
+## 
+
+### Example 1: Progresa
+
+$$ Y_{i} = \beta_0 + \beta_1 \mbox{Treat}_i + \beta_2 \mbox{Girl}_i + \beta_3 \mbox{Treat}_i \times   \mbox{Girl}_i + \epsilon_i.$$
+
+-   CATE for boys:
+    $~~\mathbb{E}[Y_{1i}-Y_{0i} \mid \mbox{Boy}] = \beta_1$,
+-   CATE for girls:
+    $~~\mathbb{E}[Y_{1i}-Y_{0i} \mid \mbox{Girl}]= \beta_1 + \beta_3$,
+-   ATE:
+    $~~\mathbb{E}[Y_{1i}-Y_{0i}] = \beta_1+\Pr[\mbox{Girl}_i=1] \cdot \beta_3.$
+
+How to justify this interpretation of coefficients?
+
+## 
+
+### Example 1: Progresa
+
+$$ Y_{i} = \beta_0 + \beta_1 \mbox{Treat}_i + \beta_2 \mbox{Girl}_i + \beta_3 \mbox{Treat}_i \times   \mbox{Girl}_i + \epsilon_i.$$
+
+Gender difference:
+
+-   without treatment: $~~ \beta_2$,
+
+-   with treatment: $~~ \beta_2 + \beta_3$,
+
+-   overall: $~~ \beta_2 + \Pr[\mbox{Treat}_i=1] \cdot \beta_3$.
+
+How to justify this interpretation of coefficients?
+
+## 
+
+### Example 1: Progresa
+
+$$ Y_{i} = \beta_0 + \beta_1 \mbox{Treat}_i + \beta_2 \mbox{Girl}_i + \beta_3 \mbox{Treat}_i \times   \mbox{Girl}_i + \epsilon_i.$$
+
+OLS estimates in this example are equivalent to sample means, diff in
+sample means, and diff in diff of sample means.
+
+-   $\widehat \beta_0$ is equivalent to sample mean of $Y$ among
+    untreated boys,
+-   $\widehat \beta_1$, $\widehat \beta_2$ are equivalent to differences
+    in sample means,
+-   $\widehat \beta_3$ is equivalent to diff-in-diff in sample means.
+
+## 
+
+### Example 1: Progresa
+
+$$ Y_{i} = \beta_0 + \beta_1 \mbox{Treat}_i + \beta_2 \mbox{Girl}_i + \beta_3 \mbox{Treat}_i \times   \mbox{Girl}_i + \epsilon_i.$$
+
+OLS estimates in this example are equivalent to sample means, diff in
+sample means, and diff in diff of sample means.
+
+-   How to show?
+
+## 
+
+### Example 1: Progresa
+
+$$ Y_{i} = \beta_0 + \beta_1 \mbox{Treat}_i + \beta_2 \mbox{Girl}_i + \beta_3 \mbox{Treat}_i \times   \mbox{Girl}_i + \epsilon_i.$$
+
+OLS estimates in this example are equivalent to sample means, diff in
+sample means, and diff in diff of sample means.
+
+-   Estimate
+    -   CATE for boys: $~~\widehat \beta_1$,
+    -   CATE for girls: $~~\widehat \beta_1 + \widehat \beta_3$,
+    -   ATE:
+        $~~\widehat \beta_1 + \overline{\mbox{Girl}} \cdot \widehat \beta_3$.
+
+## 
+
+### Example 1: Progresa
+
+$$ Y_{i} = \beta_0 + \beta_1 \mbox{Treat}_i + \beta_2 \mbox{Girl}_i + \beta_3 \mbox{Treat}_i \times   \mbox{Girl}_i + \epsilon_i.$$
+
+OLS estimates in this example are equivalent to sample means, diff in
+sample means, and diff in diff of sample means.
+
+-   Estimate average gender difference
+    -   without treatment: $~~\widehat \beta_2$,
+    -   with treatment: $~~\widehat \beta_2 + \widehat \beta_3$,
+    -   overall:
+        $~~\widehat \beta_2 + \overline{\mbox{Treat}} \cdot \widehat \beta_3$.
+
+## 
+
+### Example 1: Progresa
+
+$$ Y_{i} = \beta_0 + \beta_1 \mbox{Treat}_i + \beta_2 \mbox{Girl}_i + \beta_3 \mbox{Treat}_i \times   \mbox{Girl}_i + \epsilon_i.$$
+Consider testing null of zero average effect for
+
+-   boys, $~H_0 : \beta_1 = 0$,
+-   girls, $~H_0: \beta_1 + \beta_3 = 0$,
+-   boys or girls: $~H_0: \beta_1 =0$ and $\beta_3=0$,
+-   on average: $~H_0: \beta_1+\Pr[\mbox{Girl}_i=1] \cdot \beta_3=0$,
+-   no gender difference in average effect: $~H_0 : \beta_3 = 0$.
+
+## 
+
+### Example 1: Progresa
+
+$$ Y_{i} = \beta_0 + \beta_1 \mbox{Treat}_i + \beta_2 \mbox{Girl}_i + \beta_3 \mbox{Treat}_i \times   \mbox{Girl}_i + \epsilon_i.$$
+Consider asymptotic CI for
+
+-   CATE for boys, $~~\beta_1$,
+-   CATE for girls, $~~\beta_1 + \beta_3$,
+-   ATE: $~~\beta_1+\Pr[\mbox{Girl}_i=1] \cdot \beta_3$,
+-   gender difference in average effects: $~~\beta_3$.
+
+## 
+
+### Example 1: Progresa
+
+$$ Y_{i} = \beta_0 + \beta_1 \mbox{Treat}_i + \beta_2 \mbox{Girl}_i + \beta_3 \mbox{Treat}_i \times   \mbox{Girl}_i + \epsilon_i.$$
+Likewise estimates, testing nulls, and confidence intervals for gender
+differences.
+
+## 
+
+### Example 1: Progresa
+
+In these examples, some parameters
+
+-   are single elements of $\beta$,
+    -   e.g., CATE for boys, $~~\beta_1$,
+-   are more generally linear functions of $\beta$,
+    -   e.g., CATE for girls, $~~\beta_1 + \beta_3$,
+-   are nonlinear functions $(\beta,\mathbb{E}(X))$,
+    -   e.g., ATE: $~~\beta_1+\Pr[\mbox{Girl}_i=1] \cdot \beta_3=0$.
+
+Estimation/CIs for each case?
+
+## 
+
+### Example 1: Progresa
+
+In these examples, some tests are of
+
+-   single linear restriction on $\beta$,
+    -   e.g., no effect on average for boys.
+-   multiple linear restrictions on $\beta$,
+    -   e.g., no effect on average for boys or for girls,
+-   are linear restrictions on $(\beta,\mathbb{E}(X))$,
+    -   e.g., no effect on average.
+
+Testing for each case?
+
+## 
+
+### Example 2: Cost Function ([Nerlove 1963](https://www.researchgate.net/profile/Marc-Nerlove/publication/247406739_Returns_to_Scale_in_Electricity_Supply/links/54d8f7e70cf2970e4e7a670e/Returns-to-Scale-in-Electricity-Supply.pdf))
+
+Consider the following cost function for electric companies:
+
+$$\begin{multline*} \log C_i = \beta_0 + \beta_1 \log Q_i  + \beta_2 \log PL_i +\\ \beta_3 \log PK_i + \beta_4 \log PF_i + \epsilon_i.\end{multline*}$$
+
+-   $C_i$ is total cost,
+
+-   $Q_i$ is output,
+
+-   $PL_i$ is unit price of labor,
+
+-   $PK_i$ is unit price of capital,
+
+-   $PF_i$ is unit price of fuel.
+
+## 
+
+### Example 2: Cost Function ([Nerlove 1963](https://www.researchgate.net/profile/Marc-Nerlove/publication/247406739_Returns_to_Scale_in_Electricity_Supply/links/54d8f7e70cf2970e4e7a670e/Returns-to-Scale-in-Electricity-Supply.pdf))
+
+Consider the following cost function for electric companies:
+
+$$\begin{multline*} \log C_i = \beta_0 + \beta_1 \log Q_i  + \beta_2 \log PL_i +\\ \beta_3 \log PK_i + \beta_4 \log PF_i + \epsilon_i.\end{multline*}$$
+
+How does entering outcome and covariates in logs change interpretation
+of coefficients?
+
+## 
+
+### Example 2: Cost Function ([Nerlove 1963](https://www.researchgate.net/profile/Marc-Nerlove/publication/247406739_Returns_to_Scale_in_Electricity_Supply/links/54d8f7e70cf2970e4e7a670e/Returns-to-Scale-in-Electricity-Supply.pdf))
+
+Consider the following cost function for electric companies:
+
+$$\begin{multline*} \log C_i = \beta_0 + \beta_1 \log Q_i  + \beta_2 \log PL_i +\\ \beta_3 \log PK_i + \beta_4 \log PF_i + \epsilon_i.\end{multline*}$$
+Consider
+
+$$~H_0 : \beta_2+ \beta_3 + \beta_4 =1, ~~~ \mbox{vs}~~~H_1:  \beta_2+ \beta_3 + \beta_4 \ne 1.$$
+
+-   What is economic meaning of $H_0$?
+
+-   $H_0$ is a linear restriction on $\beta$, how to test?
+
+## 
+
+### Example 3: Mincer Wage Equation
+
+Mincer wage equation ([Mincer
+1958](https://www.jstor.org/stable/1827422?seq=1)):
+
+$$\ln(wage)_i = \beta_0  + \beta_{1} \texttt{educ}_i
++ \beta_2 \mbox{exp}_i + \beta_3 \mbox{exp}_i^2 + \epsilon_i.$$
+
+-   How does entering outcome variable in logs change interpretation of
+    coefficients?
+
+-   Model linear in parameters ($\beta$s) but non-linear in experience.
+
+-   Expect $\beta_2>0$, $\beta_3<0$, concave function of experience.
+
+## 
+
+### Example 3: Mincer Wage Equation
+
+Mincer wage equation ([Mincer
+1958](https://www.jstor.org/stable/1827422?seq=1)):
+
+$$\ln(wage)_i = \beta_0  + \beta_{1} \texttt{educ}_i
++ \beta_2 \mbox{exp}_i + \beta_3 \mbox{exp}_i^2 + \epsilon_i.$$
+
+-   Marginal effect of experience: $\beta_2 + 2 \beta_3 \mbox{exp}_i$.
+
+    -   marg. effect if $\mbox{exp}_i=0$: $~~~\beta_2~$;
+
+    -   marg. effect if $\mbox{exp}_i=10$: $~~~\beta_2 + 20~ \beta_3$;
+
+    -   avg marg. effect: $~~~\beta_2 + 2\beta_3 E[ \mbox{exp}_i]$.
+
+## 
+
+### Example: Mincer Wage Equation
+
+Mincer wage equation ([Mincer
+1958](https://www.jstor.org/stable/1827422?seq=1)):
+
+$$\ln(wage)_i = \beta_0  + \beta_{1} \texttt{educ}_i
++ \beta_2 \mbox{exp}_i + \beta_3 \mbox{exp}_i^2 + \epsilon_i.$$
+
+-   Marginal effect of experience: $\beta_2 + 2 \beta_3 \mbox{exp}_i$.
+
+    -   Supposing $\beta_2>0$, $\beta_3<0$, experience level that
+        maximizes log wage: $$- \frac{\beta_2}{2 \beta_3}.$$
+
+<!-- ##  -->
+
+<!-- ### Example: Mincer Wage Equation -->
+
+<!-- Mincer wage equation ([Mincer 1958](https://www.jstor.org/stable/1827422?seq=1)): -->
+
+<!-- $$\ln(wage)_i = \beta_0  + \beta_{1} \texttt{educ}_i -->
+
+<!-- + \beta_2 \mbox{exp}_i + \beta_3 \mbox{exp}_i^2 + \epsilon_i.$$ -->
+
+<!-- -   Average effect of experience: $$\beta_1 + 2 \cdot \beta_2 \cdot \mathbb{E}(\mbox{exp}),$$ -->
+
+<!-- -   Experience level that maximizes log wage: $$\left | \frac{\beta_1}{2 \beta_2}\right |.$$ -->
+
+## 
+
+### Example: Mincer Wage Equation
+
+Mincer wage equation ([Mincer
+1958](https://www.jstor.org/stable/1827422?seq=1)):
+
+$$\ln(wage)_i = \beta_0  + \beta_{1} \texttt{educ}_i
++ \beta_2 \mbox{exp}_i + \beta_3 \mbox{exp}_i^2 + \epsilon_i.$$
+
+<!-- -   Let $\widehat \beta_{1,N}, \widehat \beta_{2,N}$ denote OLS estimators, -->
+
+<!-- -   Let $\overline{\mbox{exp}}_N$ denote sample mean of experience. -->
+
+-   Estimate average effect of experience by
+    $$\widehat \beta_{2,N} + 2 \cdot \widehat \beta_{3,N} \cdot \overline{\mbox{exp}}_N,$$
+
+    -   Estimator is a *non-linear* function of
+        $(\widehat \beta, \overline{X})$.
+
+## 
+
+### Example: Mincer Wage Equation
+
+Mincer wage equation ([Mincer
+1958](https://www.jstor.org/stable/1827422?seq=1)):
+
+$$\ln(wage)_i = \beta_0  + \beta_{1} \texttt{educ}_i
++ \beta_2 \mbox{exp}_i + \beta_3 \mbox{exp}_i^2 + \epsilon_i.$$ -
+Estimate experience level that maximizes log wage by
+$$- \frac{\widehat \beta_{2,N}}{2 \widehat \beta_{3,N}}.$$
+
+-   Estimator is a non-linear functions of $\widehat \beta.$
+
+## Implement Mincer Wage Equation
+
+```{r}
+#| echo: false
+# install packages using install.packages( )  if not already installed  
+library(ggplot2)
+library(cowplot)
+library(DT)
+```
+
+```{r}
+#| echo: false
+theme_set(theme_bw())
+theme_set(theme_bw(base_size = 14))
+options(scipen=999)
+```
+
+```{r first}
+#| output: false
+#| echo: false
+library (AER)
+data(CPS1985)
+df  <- CPS1985[ , c("wage","education","experience")]
+mean.exp <-mean(df$experience) 
+mean.exp
+reg.1 <- lm(I(log(wage))~education+experience+I(experience^2),data=df)
+reg.1
+a <- c(0,0,1,2*mean.exp)
+avg.eff.exp <- as.numeric(t(a)%*%coef(reg.1)) 
+maxexp <- abs(coef(reg.1)[3]/(2*coef(reg.1)[4]))
+```
+
+```{r }
+#| output: false
+#| echo: false
+ 
+theta.hat <- as.numeric(t(a)%*%coef(reg.1)) 
+
+reg.fit  <- function(x){
+ coef(reg.1)[1] + 12*coef(reg.1)[2] + x* coef(reg.1)[3]+ (x^2) * coef(reg.1)[4]
+}
+
+fig.0 <- ggplot(data=df, aes(x= experience, y=I(log(wage)),color="lightblue"))+
+  ylim(reg.fit(0)-0.05,reg.fit(maxexp)+0.05)+     theme_half_open()+xlim(0, 46)+
+ xlab("experience") + ylab("Log Wage")+
+  stat_function(fun=reg.fit,color="darkblue")+
+    geom_segment(mapping=aes(x=maxexp, y=reg.fit(0)-.05, 
+    xend=maxexp, yend=reg.fit(maxexp)),linetype="dotted", 
+    color = "red")+scale_y_continuous(expand = c(0,0))
+
+```
+
+```{r }
+#| eval: false
+#| echo: true
+#| code-line-numbers: "1-3"
+<<first>>
+
+```
+
+-   Consider estimation using CPS 1985 data.
+
+    -   available in package `AER`.
+
+    -   after loading `AER`, see `?CPS1985` for description of data.
+
+<!-- -   Consider only using observations with $12$ years of schooling. -->
+
+## Implement Mincer Wage Equation {auto-animate="true"}
+
+```{r }
+#| eval: false
+#| echo: true
+#| code-line-numbers: "4-7"
+<<first>>
+```
+
+```{r  }
+#| output: true
+#| echo: false
+print(paste0("Mean Experience: ", signif(mean.exp,4)))
+reg.1
+```
+
+## Implement Mincer Wage Equation {auto-animate="true"}
+
+```{r second }
+#| eval: false
+#| echo: true
+#| code-line-numbers: "5-9"
+mean.exp <-mean(df$experience) 
+mean.exp
+reg.1 <- lm(I(log(wage))~education+experience+I(experience^2),data=df)
+reg.1
+a <- c(0,0,1,2*mean.exp)
+avg.eff.exp <- as.numeric(t(a)%*%coef(reg.1)) 
+maxexp <- abs(coef(reg.1)[3]/(2*coef(reg.1)[4]))
+avg.eff.exp
+maxexp
+```
+
+```{r  }
+#| output: true
+#| echo: false
+print(paste0("Estimated Avg Effect Experience: ",signif(avg.eff.exp,3)))
+print(paste0("Estimated Experience that Maximizes Wage: ",signif(maxexp,3)))
+```
+
+## Implement Mincer Wage Equation
+
+```{r }
+#| eval: false
+#| echo: true
+#| code-line-numbers: "2,4,8-9"
+<<second>>
+```
+
+::::: columns
+::: {.column width="50%"}
+-   $\overline{\mbox{exp}}_N=$ `r signif(mean.exp,3)`
+
+-   $\widehat \beta_{2,N} =$ `r signif(coef(reg.1)[3],3)`
+
+-   $\widehat \beta_{3,N} =$ `r signif(coef(reg.1)[4],3)`
+:::
+
+::: {.column width="50%"}
+-   $\widehat \beta_{2,N} + 2 \widehat \beta_{3,N} \overline{\mbox{exp}}_N=$
+    `r signif(avg.eff.exp,3)`
+
+-   $\left | \frac{\widehat \beta_{2,N}}{2 \widehat \beta_{3,N}}\right| =$
+    `r signif(maxexp,3)`
+:::
+:::::
+
+## Motivation: Mincer Wage Equation
+
+::::: columns
+::: {.column width="50%"}
+-   $\widehat \beta_{2,N} + 2 \widehat \beta_{3,N} \overline{\mbox{exp}}_N=$
+    `r signif(avg.eff.exp,3)`
+
+-   $\left | \frac{\widehat \beta_{2,N}}{2 \widehat \beta_{3,N}}\right| =$
+    `r signif(maxexp,3)`
+:::
+
+::: {.column width="50%"}
+```{r }
+fig.0
+```
+:::
+:::::
+
+<!-- -   We have *not* covered methods for constructing standard errors or performing inference in this context. -->
+
+-   How to compute standard errors? construct confidence intervals?
+    perform hypothesis tests?
+
+# Linear Combination of Coefficients
+
+## 
+
+### Recall Asymptotic Distribution of OLS
+
+Under regularity conditions,\
+$$\sqrt{N} \left( \widehat \beta_N - \beta \right) \stackrel{d}{\rightarrow} Z,~~~Z \sim N(0,\Sigma),$$
+which by CMT implies that, for any continuous function $g$,
+$$g\left(\sqrt{N} \left(  \widehat \beta_N -   \beta \right)\right) \stackrel{d}{\rightarrow} g(Z),~~~Z \sim N(0,\Sigma),$$
+and thus, for $a$ any $(K+1)\times 1$ vector of constants,
+$$\sqrt{N} \left( a^{\prime} \widehat \beta_N - a^{\prime} \beta \right) \stackrel{d}{\rightarrow} N(0, a^{\prime} \Sigma a).$$
+
+## 
+
+### Standard Errors for Linear Combination of $\beta$
+
+$$\sqrt{N} \left( a^{\prime} \widehat \beta_N - a^{\prime} \beta \right) \stackrel{d}{\rightarrow} N(0, a^{\prime} \Sigma a).$$
+
+-   Let $\widehat \Sigma_N$ denote a consistent estimator of $\Sigma$,
+    $$\widehat \Sigma_N \stackrel{p}{\rightarrow} \Sigma ~~\Rightarrow ~~ a^{\prime} \widehat \Sigma_N a \stackrel{p}{\rightarrow} a^{\prime} \Sigma a.$$
+
+    $$
+    \mbox{s.e.}(a^{\prime} \widehat \beta_N) = \widehat \omega_N / \sqrt{N} ~~\mbox{where}~~ \widehat \omega^2_N =  a^{\prime} \widehat \Sigma_N a
+    $$
+
+## 
+
+### Test Null for Linear Combination of $\beta$.
+
+Consider
+$$H_0: a^{\prime} \beta = a^{\prime} b,~~~\mbox{vs}~~  H_1: a^{\prime} \beta \ne a^{\prime} b.$$
+
+-   Define test statistic:
+    $$T_N =  \frac{a^{\prime} \widehat \beta_N - a^{\prime} b}{\mbox{s.e.}(a^{\prime} \widehat \beta_N)}  .$$
+
+## 
+
+### Test Null for Linear Combination of $\beta$.
+
+$T_N \stackrel{d}{\rightarrow} N(0,1)$ under $H_0$.
+
+For test at (asymptotic) level $\alpha$,
+
+-   reject $H_0$ if $| T_N | \ge c_{1-\alpha/2}$ where
+    $c_{1-\alpha/2} = \Phi^{-1}(1-\alpha/2)$.
+
+-   equivalently, define $p = 2 (1- \Phi(| T_N| ))$, reject null if
+    $p \le \alpha$.
+
+## 
+
+### CI for Linear Combination of $\beta$
+
+Define
+$$T_N(a^{\prime} b) =   \frac{a^{\prime} \widehat \beta_N - a^{\prime} b}{\mbox{s.e.}(a^{\prime} \widehat \beta_N)}  .$$
+
+Invert (asymptotic) level $\alpha$ test to form $1-\alpha$ asymptotic
+CI:
+$$ \widehat C_N   = \left \{a^{\prime} b: | T_N(a^{\prime} b) |\leq c_{1-\alpha/2}\right \} \\ = \left[ a^{\prime}  \widehat\beta_N - c_{1-\alpha/2} \times \mbox{s.e.}(a^{\prime} \widehat \beta_N), ~a^{\prime}  \widehat\beta_N + c_{1-\alpha/2} \times \mbox{s.e.}(a^{\prime} \widehat \beta_N) \right].$$
+
+## 
+
+### CI for Linear Combination of $\beta$
+
+$$ \widehat C_N   = \left \{a^{\prime}  b: | T_N(a^{\prime}  b) |\leq c_{1-\alpha/2}\right \}$$
+
+$$\Rightarrow \Pr  \left (a^{\prime}  \beta \in \widehat{C}_N\right ) = \Pr\left (| T_N(a^{\prime}  \beta)| \leq c_{1-\alpha/2}\right) \rightarrow 1-\alpha,$$
+
+-   Thus $\widehat C_N$ is asymptotic $1-\alpha$ CI on
+    $a^{\prime} \beta$.
+
+## 
+
+### CI for Linear Combination of $\beta$
+
+$$ \widehat C_N   = \left \{a^{\prime}  b: |T_N(a^{\prime}  b) |\leq c_{1-\alpha/2}\right \}$$
+
+$$\Rightarrow \Pr\left (a^{\prime}  \beta \in \widehat{C}_N\right ) = \Pr\left (| T_N(a^{\prime}  \beta  ) | \leq c_{1-\alpha/2}\right) \rightarrow 1-\alpha,$$
+
+-   Can use $\widehat C_N$ to test null
+    $H_0: a^{\prime} \beta = a^{\prime} b$ for any $a^{\prime} b$.
+
+    -   Reject $H_0: a^{\prime} \beta = a^{\prime} b$ for any
+        $a^{\prime} b \not \in \widehat{C}_N$.
+
+    -   Fail to reject $H_0: a^{\prime} \beta = a^{\prime} b$ for any
+        $a^{\prime} b  \in \widehat{C}_N$.
+
+## 
+
+### Digression: Failure to Reject $H_0$ as Evidence $H_0$ is True
+
+A common misconception is to interpret acceptance of the null hypothesis
+as evidence that the null is true.
+
+-   Such an interpretation is only warranted if the power of the test
+    against alternatives of interest is high.
+-   If the test has low power against an alternative of interest, then
+    it is unlikely to reject the false null when that alternative it
+    true, and we should expect the test to incorrectly accept the null
+    even when that alternative is true instead.
+
+## 
+
+::::: columns
+::: {.column width="50%"}
+[![](figs/wrong_interpretations.png){fig-align="left"
+width="2500"}](https://www.nature.com/articles/d41586-019-00857-9)
+:::
+
+::: {.column width="50%"}
+-   Figure from [Amrhein et al.
+    (2019)](https://www.nature.com/articles/d41586-019-00857-9) who
+    provide a discussion of this misconception across fields.
+
+-   Ziliak and McCloskey made related points in a series of
+    publications, arguing against "asterisk econometrics". See, e.g.,
+    [Size matters: the standard error of regressions in the American
+    Economic Review](https://doi.org/10.1016/j.socec.2004.09.024)
+:::
+:::::
+
+## 
+
+### Digression: Failure to Reject $H_0$ as Evidence $H_0$ is True
+
+-   CI shows range of null hypotheses that are not rejected.
+
+-   If estimating effect, how to interpret evidence if:
+
+    -   CI includes 0 but also values far from 0?
+
+    -   CI includes 0 and only values close to 0?
+
+        -   Sometimes called "precisely estimated 0" in applied work.
+
+## 
+
+### Example 1: Progresa
+
+$$ Y_{i} = \beta_0 + \beta_1 \mbox{Treat}_i + \beta_2 \mbox{Girl}_i + \beta_3 \mbox{Treat}_i \times   \mbox{Girl}_i + \epsilon_i.$$
+
+-   $\mbox{CATE for girls:}~ \beta_1 + \beta_3 = a^{\prime}\beta,$
+
+-   $\mbox{Estimated CATE for girls:}~  \widehat \beta_1 + \widehat \beta_3 = a^{\prime}\widehat \beta,$
+
+with $a = (0,1,0,1)^{\prime}$.
+$\mbox{s.e.}(a^{\prime} \widehat \beta_N) = \widehat \omega_N / \sqrt{N}$
+where
+$$ \widehat \omega^2_N =  a^{\prime} \widehat \Sigma_N a =\widehat \sigma^2_{2}+\widehat \sigma^2_{4}+2~\widehat \sigma_{24}$$
+
+## 
+
+### Example 1: Progresa
+
+$$ Y_{i} = \beta_0 + \beta_1 \mbox{Treat}_i + \beta_2 \mbox{Girl}_i + \beta_3 \mbox{Treat}_i \times   \mbox{Girl}_i + \epsilon_i.$$
+
+$$\widehat \beta_1 + \widehat \beta_3 = a^{\prime}\widehat \beta,~~~ a = (0,1,0,1)^{\prime}.$$
+
+$$
+\mbox{s.e.}(a^{\prime} \widehat \beta_N) = \widehat \omega_N / \sqrt{N} = \sqrt{\frac{\widehat \sigma^2_{2} + \widehat \sigma^2_{4} + 2 ~ \widehat \sigma_{2,4}}{N}}. 
+$$
+
+Consider null of zero average effect for girls,
+$H_0 : \beta_1 + \beta_3=0$ against 2-sided alternative.
+
+## 
+
+### Example 1: Progresa
+
+$$T_N = \biggl | \frac{a^{\prime} \widehat \beta_N}{\mbox{s.e.}(a^{\prime} \widehat \beta_N)} \biggr |,~~~~p =2 (1- \Phi(T_N)),$$
+$$\widehat C_N = \left[ a^{\prime}  \widehat\beta_N - c_{1-\frac{\alpha}{2}} \cdot \mbox{s.e.}(a^{\prime} \widehat \beta_N), a^{\prime}  \widehat\beta_N+ c_{1-\frac{\alpha}{2}} \cdot \mbox{s.e.}(a^{\prime} \widehat \beta_N) \right].$$
+
+Reject $H_0: \beta_1 + \beta_3=0$ if
+
+-   $T_N \ge c_{1-\alpha/2}$, where
+    $~c_{1-\alpha/2} = \Phi^{-1}(1-\alpha/2)$.
+
+-   equivalently, if $p \le \alpha$,
+
+-   equivalently, if $0 \not \in \widehat C_N$.
+
+## 
+
+### Example 1: Progresa
+
+$$T_N = \biggl | \frac{a^{\prime} \widehat \beta_N}{\mbox{s.e.}(a^{\prime} \widehat \beta_N)} \biggr |,~~~~p =2 (1- \Phi(T_N)),$$
+$$\widehat C_N = \left[ a^{\prime}  \widehat\beta_N - c_{1-\frac{\alpha}{2}} \cdot \mbox{s.e.}(a^{\prime} \widehat \beta_N), a^{\prime}  \widehat\beta_N+ c_{1-\frac{\alpha}{2}} \cdot \mbox{s.e.}(a^{\prime} \widehat \beta_N) \right].$$
+
+-   Reject $H_0: \beta_1 + \beta_3=t_0$ for any
+    $t_0 \not \in \widehat C_N$.
+
+-   Fail to Reject $H_0: \beta_1 + \beta_3=t_0$ for any $t_0
+     \in \widehat C_N$.
+
+## Example 1: Progresa {auto-animate="true"}
+
+```{r }
+#| eval: false
+#| echo: true
+#| code-line-numbers: "1-4"
+library(sandwich) # includes vcovHC
+library(lmtest) # includes coeftest
+reg.1 <- lm(school ~ treat * girl, df) # run regression
+reg.test.1 <- coeftest(reg.1,vcov=vcovHC) # heterosckedastic-robust inference
+```
+
+[Note that `coeftest` and `coefci` use HC3 by default, can change to HC2
+(also good properties) or HC1 (most common in applied economics) if
+desired.]{style="font-size:0.8em;"}
+
+## Example 1: Progresa {auto-animate="true"}
+
+```{r }
+#| eval: false
+#| echo: true
+#| code-line-numbers: "5"
+library(sandwich) # includes vcovHC
+library(lmtest) # includes coeftest
+reg.1 <- lm(school ~ treat * girl, df) # run regression
+reg.test.1 <- coeftest(reg.1,vcov=vcovHC) # heterosckedastic-robust inference
+reg.test.1 #heterosckedastic-robust inference
+```
+
+```{r }
+#| eval: true
+#| echo: false
+library(stargazer)
+options(scipen = 999)
+df <- read.csv("https://edward-vytlacil.github.io/Data/PROGRESA.csv", header=TRUE, sep=",") # read csv
+df$treat <- df$progresa1 
+df$girl <- df$sex1 
+df<-subset(df, wave==4 | wave==1,
+           select= c(sooloca,sooind_id,age1,hgc1,school,treat,girl,wave))
+balanced_ids <- intersect(df[df$wave==4,"sooind_id"],
+                  df[df$wave==1 & df$age1>=6 & df$age1<=16,"sooind_id"])
+df <- df[df$sooind_id %in% balanced_ids & df$wave==4,]
+library(sandwich) # includes vcovHC
+library(lmtest) # includes coeftest
+reg.1 <- lm(school ~ treat * girl, df) # run regression
+reg.test.1 <- coeftest(reg.1,vcov=vcovHC) # heterosckedastic-robust inference
+reg.test.1
+```
+
+## Example 1: Progresa {auto-animate="true"}
+
+```{r }
+#| eval: false
+#| echo: true
+#| code-line-numbers: "5"
+library(sandwich) # includes vcovHC
+library(lmtest) # includes coeftest
+reg.1 <- lm(school ~ treat * girl, df) # run regression
+reg.test.1 <- coeftest(reg.1,vcov=vcovHC) # heterosckedastic-robust inference
+coefci(reg.1,   level=.95, vcov = vcovHC) # heterosckedastic-robust inference
+```
+
+```{r }
+#| eval: true
+#| echo: false
+coefci(reg.1,   level=.95, vcov = vcovHC) # heterosckedastic-robust inference
+```
+
+## Example 1: Progresa {auto-animate="true"}
+
+```{r }
+#| eval: false
+#| echo: true
+#| code-line-numbers: "5"
+library(sandwich) # includes vcovHC
+library(lmtest) # includes coeftest
+reg.1 <- lm(school ~ treat * girl, df) # run regression
+reg.test.1 <- coeftest(reg.1,vcov=vcovHC) # heterosckedastic-robust inference
+vcovHC(reg.1) 
+```
+
+```{r}
+#| eval: true
+#| echo: false
+#| output: true
+vcovHC(reg.1)
+```
+
+-   Reporting $\widehat \Sigma / N$.
+-   How to get s.e. on estimated avg effect for girls,
+    $\mbox{s.e.}(\widehat \beta_1 + \widehat \beta_3)$? Inference for
+    avg effect on girls? CI?
+
+## Example 1: Progresa {auto-animate="true"}
+
+```{r }
+#| eval: false
+#| echo: true
+#| code-line-numbers: "4-6"
+reg.1 <- lm(school ~ treat * girl, df) # run regression
+reg.test.1 <- coeftest(reg.1,vcov=vcovHC) # HC3 by default heterosckedastic-robust inference
+vcovHC(reg.1) 
+a <- c(0,1,0,1)
+se.girls <- as.numeric(sqrt(t(a)%*%vcovHC(reg.1)%*%a))
+se.girls
+```
+
+```{r}
+#| eval: true
+#| echo: false
+#| output: true
+a <- c(0,1,0,1)
+se.girls <- as.numeric(sqrt(t(a)%*%vcovHC(reg.1)%*%a))
+se.girls
+```
+
+## Example 1: Progresa {auto-animate="true"}
+
+```{r }
+#| eval: false
+#| echo: true
+#| code-line-numbers: "7-10"
+reg.1 <- lm(school ~ treat * girl, df) # run regression
+reg.test.1 <- coeftest(reg.1,vcov=vcovHC) # heterosckedastic-robust inference
+vcovHC(reg.1) 
+a <- c(0,1,0,1)
+se.girls <- as.numeric(sqrt(t(a)%*%vcovHC(reg.1)%*%a))
+se.girls
+estimate.girls <- t(a)%*%summary(reg.1)$coefficients[,1]
+tstat <- as.numeric(estimate.girls / se.girls)
+pvalue.girls <- 2 * (1 - pnorm(abs(tstat)))
+pvalue.girls 
+```
+
+```{r}
+#| eval: true
+#| echo: false
+#| output: true
+estimate.girls <- t(a)%*%summary(reg.1)$coefficients[,1]
+tstat <- as.numeric(estimate.girls / se.girls)
+pvalue.girls <- 2*(1-pnorm(estimate.girls/se.girls))
+pvalue.girls 
+```
+
+Reject null of no effect on avg. for girls at level $0.05$ since p-value
+$\le 0.05$.
+
+## Example 1: Progresa {auto-animate="true"}
+
+```{r }
+#| eval: false
+#| echo: true
+#| code-line-numbers: "8-11"
+reg.1 <- lm(school ~ treat * girl, df) # run regression
+reg.test.1 <- coeftest(reg.1,vcov=vcovHC) # heterosckedastic-robust inference
+vcovHC(reg.1) 
+a <- c(0,1,0,1)
+se.girls <- as.numeric(sqrt(t(a)%*%vcovHC(reg.1)%*%a))
+se.girls
+estimate.girls <- t(a)%*%summary(reg.1)$coefficients[,1]
+crit <- qnorm(.975)
+CI.lower <- estimate.girls - crit * se.girls
+CI.upper <- estimate.girls + crit * se.girls
+print(paste0("CI:(",round(CI.lower,digits=4),",",round(CI.upper,digits=4),")"))
+```
+
+```{r}
+#| eval: true
+#| echo: false
+#| output: true
+CI.lower <- estimate.girls - qnorm(.975)*se.girls
+CI.upper <- estimate.girls + qnorm(.975)*se.girls
+print(paste0("95% CI:(",round(CI.lower,digits=4),",",round(CI.upper,digits=4),")"))
+```
+
+Which values for effect on girls can we reject at 95% level?
+
+## 
+
+### Example 2: Cost Function ([Nerlove 1963](https://www.researchgate.net/profile/Marc-Nerlove/publication/247406739_Returns_to_Scale_in_Electricity_Supply/links/54d8f7e70cf2970e4e7a670e/Returns-to-Scale-in-Electricity-Supply.pdf))
+
+$$\begin{multline*} \log C_i = \beta_0 + \beta_1 \log Q_i  + \beta_2 \log PL_i +\\ \beta_3 \log PK_i + \beta_4 \log PF_i + \epsilon_i,\end{multline*}$$
+
+$$~H_0 : \beta_2+ \beta_3 + \beta_4 =1, ~~~ \mbox{vs}~~~H_1:  \beta_2+ \beta_3 + \beta_4 \ne 1.$$
+Restate as:
+$$~H_0 : a'\beta   =1, ~~~ \mbox{vs}~~~H_1:  a'\beta \ne 1,$$ for
+$a = (0,0,1,1,1)^{\prime}$.
+
+## 
+
+### Example 2: Cost Function ([Nerlove 1963](https://www.researchgate.net/profile/Marc-Nerlove/publication/247406739_Returns_to_Scale_in_Electricity_Supply/links/54d8f7e70cf2970e4e7a670e/Returns-to-Scale-in-Electricity-Supply.pdf))
+
+$$H_0 : a'\beta   =1, ~~ \mbox{vs}~~H_1:  a'\beta \ne 1,~~ \mbox{with} ~~a = (0,0,1,1,1)^{\prime}.$$
+$$T_N = \biggl | \frac{a^{\prime} \widehat \beta_N -1}{\mbox{s.e.}(a^{\prime} \widehat \beta_N)} \biggr |,~~~~p =2 (1- \Phi(T_N)),\\ \mbox{s.e.}(a^{\prime} \widehat \beta_N) = \widehat \omega_N / \sqrt{N}~~~\mbox{with} ~~~ \widehat \omega^2_N =  a^{\prime} \widehat \Sigma_N a.$$
+
+Reject $H_0$ if
+
+-   $T_N \ge c_{1-\alpha/2}$, where
+    $~c_{1-\alpha/2} = \Phi^{-1}(1-\alpha/2)$.
+
+-   equivalently, if $p \le \alpha$,
+
+```{r}
+library("haven")
+df.N <- read_dta("https://edward-vytlacil.github.io/Data/Nerlove1963.dta")  
+reg.c <- lm(log(cost) ~ log(output) + log(Plabor)+ log(Pcapital) +log(Pfuel) , data=df.N)
+
+```
+
+## 
+
+### Example 3: Mincer Wage Equation
+
+$$\ln(wage)_i = \beta_0  + \beta_{1} \texttt{educ}_i
++ \beta_2 \mbox{exp}_i + \beta_3 \mbox{exp}_i^2 + \epsilon_i.$$
+
+-   Marginal effect of experience at given $10$ years of exp:
+    $\beta_2 + 20 ~\beta_3   = a^{\prime} \beta$ with
+    $a =(0,0,1,20)^{\prime}$.
+
+-   Confidence interval on that parameter:
+    $$  \left[ a^{\prime}  \widehat\beta_N - c_{1-\frac{\alpha}{2}} \cdot \mbox{s.e.}(a^{\prime} \widehat \beta_N), a^{\prime}  \widehat\beta_N+ c_{1-\frac{\alpha}{2}} \cdot \mbox{s.e.}(a^{\prime} \widehat \beta_N) \right].$$
+
+## 
+
+### Example 3: Mincer Wage Equation
+
+$$\ln(wage)_i = \beta_0  + \beta_{1} \texttt{educ}_i
++ \beta_2 \mbox{exp}_i + \beta_3 \mbox{exp}_i^2 + \epsilon_i.$$
+
+-   Average Marginal effect of Experience:
+    $\beta_2 + 2~\mathbb{E}[\mbox{exp}] ~\beta_3$,
+    -   ***cannot*** be written as $a^{\prime} \beta$ for any constant
+        $a$ if $\mathbb{E}[\mbox{exp}]$ has to be estimated.
+    -   estimator
+        $\widehat \beta_2 + 2~ \overline{\mbox{exp}} ~\widehat\beta_3$
+        is a nonlinear function of $(\hat \beta, \overline{X})$, you
+        analyzed in PS4 & PS5, we will return to this problem.
+
+## 
+
+### Example 1: Progresa Reparameterized
+
+$$ Y_{i} = \beta_0 + \beta_1 \mbox{Treat}_i + \beta_2 \mbox{Girl}_i + \beta_3 \mbox{Treat}_i \times   \mbox{Girl}_i + \epsilon_i,$$
+
+Can reparameterize the model, plugging in
+$\mbox{Boy}_i = 1- \mbox{Girl}_i$,
+
+$$ Y_{i} = \gamma_0 + \gamma_1 \mbox{Treat}_i + \gamma_2 \mbox{Boy}_i + \gamma_3 \mbox{Treat}_i \times   \mbox{Boy}_i + \epsilon_i,$$
+
+-   Effect on girls: $\beta_1+\beta_3 = \gamma_1$.
+
+-   Estimated effect on girls
+    $\widehat \beta_1+ \widehat \beta_3 = \widehat \gamma_1$.
+
+-   how to show equivalence?
+
+## 
+
+### Example 1: Progresa Reparameterized
+
+$$ Y_{i} = \beta_0 + \beta_1 \mbox{Treat}_i + \beta_2 \mbox{Girl}_i + \beta_3 \mbox{Treat}_i \times   \mbox{Girl}_i + \epsilon_i,$$
+
+Can reparameterize the model, plugging in
+$\mbox{Boy}_i = 1- \mbox{Girl}_i$,
+
+$$ Y_{i} = \gamma_0 + \gamma_1 \mbox{Treat}_i + \gamma_2 \mbox{Boy}_i + \gamma_3 \mbox{Treat}_i \times   \mbox{Boy}_i + \epsilon_i,$$
+
+-   Effect on girls: $\beta_1+\beta_3 = \gamma_1$.
+
+-   Estimated effect on girls
+    $\widehat \beta_1+ \widehat \beta_3 = \widehat \gamma_1$.
+
+-   Estimated effect corresponds to one coefficient in reparameterized
+    model.
+
+## Example 1: Progresa Reparameterized {auto-animate="true"}
+
+```{r }
+#| eval: true
+#| echo: true
+#| code-line-numbers: "5"
+df$boy <- 1- df$girl
+reg.2 <- lm(school ~ treat * boy, df) # run regression
+reg.test.2 <- coeftest(reg.2,vcov=vcovHC) # heterosckedastic-robust inference
+reg.test.2 # heterosckedastic-robust inference
+```
+
+## Example 1: Progresa Reparameterized {auto-animate="true"}
+
+```{r }
+#| eval: true
+#| echo: true
+#| code-line-numbers: "6"
+df$boy <- 1- df$girl
+reg.2 <- lm(school ~ treat * boy, df) # run regression
+reg.test.2 <- coeftest(reg.2,vcov=vcovHC) # heterosckedastic-robust inference
+  # heterosckedastic-robust inference
+coefci(reg.2,   level=.95, vcov = vcovHC)
+```
+
+## 
+
+### Example 1: Progresa Reparameterized
+
+$$ Y_{i} = \beta_0 + \beta_1 \mbox{Treat}_i + \beta_2 \mbox{Girl}_i + \beta_3 \mbox{Treat}_i \times   \mbox{Girl}_i + \epsilon_i,$$
+
+Other alternative reparameterizations can also lead to one coefficient
+equaling effect for girls, e.g.,
+
+$$ Y_{i} = \delta_0  + \delta_1 \mbox{Girl}_i +  \delta_2 \mbox{Treat}_i*\mbox{Boy}_i+  \delta_3 \mbox{Treat}_i \times   \mbox{Girl}_i + \epsilon_i,$$
+In this reparameterization:
+
+-   CATE boys: $\beta_1=\delta_2$, and
+    $\widehat \beta_1=\widehat \delta_2.$
+
+-   CATE girls: $\beta_1+\beta_3 = \delta_3$ and
+    $\widehat \beta_1+\widehat \beta_3 = \widehat \delta_3$
+
+## Example 1: Progresa Reparameterized {auto-animate="true"}
+
+```{r }
+#| eval: true
+#| echo: true
+reg.3 <- lm(school ~ girl+ treat:boy + treat:girl, df) # run regression
+reg.test.3 <- coeftest(reg.3,vcov=vcovHC) # heterosckedastic-robust inference
+reg.test.3 # heterosckedastic-robust inference
+```
+
+## Example 2: Reparameterization {auto-animate="true"}
+
+$$\begin{multline*} \log C_i = \beta_0 + \beta_1 \log Q_i  + \beta_2 \log PL_i +\\ \beta_3 \log PK_i + \beta_4 \log PF_i + \epsilon_i,\end{multline*}$$
+
+$$~H_0 : \beta_2+ \beta_3 + \beta_4 =1, ~~~ \mbox{vs}~~~H_1:  \beta_2+ \beta_3 + \beta_4 \ne 1.$$
+
+-   how to reparameterize for one coefficient to equal
+    $\beta_2+\beta_3 + \beta_4$?
+
+## Example 3: Reparameterization {auto-animate="true"}
+
+$$\ln(wage)_i = \beta_0  + \beta_{1} \texttt{educ}_i
++ \beta_2 \mbox{exp}_i + \beta_3 \mbox{exp}_i^2 + \epsilon_i.$$
+
+-   Marginal effect of experience at given $10$ years of exp:
+    $\beta_2 + 20 ~\beta_3$.
+
+-   how to reparameterize for one coefficient to equal
+    $\beta_2 + 20 ~\beta_3$?
+
+# Multiple Linear Combination of Coefficients
+
+## 
+
+### Example 1: Progresa
+
+$$ Y_{i} = \beta_0 + \beta_1 \mbox{Treat}_i + \beta_2 \mbox{Girl}_i + \beta_3 \mbox{Treat}_i \times   \mbox{Girl}_i + \epsilon_i.$$
+Consider testing null of zero average effect for both boys and girls:
+$$~H_0: \beta_1 =0~ ~ \mbox{and} ~~ \beta_3=0,~~~\mbox{vs.}~~~~H_1: \beta_1 \ne 0~ ~ \mbox{or} ~~ \beta_3\ne 0.$$
+
+-   Joint hypothesis test.
+-   How different from multiple hypothesis test?
+
+## 
+
+Consider $$H_0: R\beta=b ~~\mbox{vs}~~H_1: R\beta \neq b,$$ where $R$ is
+a $q \times (K+1)$-dimensional constant matrix and $b$ is a $q\times 1$
+vector.
+
+## 
+
+Suppose $\widehat \Sigma_N \stackrel{p}{\rightarrow} \Sigma$. Then
+
+$$\begin{align*}\sqrt{N}&(\widehat\beta_N - \beta)  \stackrel{d}{\rightarrow} N(0,  \Sigma  )\\
+ & \Rightarrow~~ \sqrt{N} (R \widehat\beta_N- R \beta) \to_d N(0, R\Sigma R')\\
+ & \Rightarrow~~ N (R \widehat\beta_N- R \beta)^{^\top}(R \widehat \Sigma_N R^{\prime})^{-1} (R \widehat\beta_N- R \beta) \stackrel{d}{\rightarrow} \chi^2_q\end{align*}$$
+
+## 
+
+Let
+$$ \begin{align*} T_N(b)  &= N (R \widehat\beta_N- b)^{^\top}(R \widehat \Sigma_N R^{\prime})^{-1} (R \widehat\beta_N-b)\\ & =  (R \widehat\beta_N- b)^{^\top}(R (\widehat \Sigma_N/N) R^{\prime})^{-1} (R \widehat\beta_N-b). \end{align*}$$
+
+$$T_N(b) \stackrel{d} {\rightarrow} \chi^2_q~~~ \mbox{under}~ H_0: R\beta=b$$
+
+## 
+
+$$T_N(b) \stackrel{d} {\rightarrow} \chi^2_q~~~ \mbox{under}~ H_0: R\beta=b$$
+
+-   Reject null at asymptotic level $\alpha$ if $T_N > c_{q,1-\alpha}$,
+    where $c_{q,1-\alpha} = \chi^2_{q,1-\alpha}$, $1-\alpha$ quantile of
+    $\chi_q^2$.
+
+-   $p$-value is $1 - F_{\chi^2_q}\!\left(T_N(b)\right)$, invert for the CI.
+
+```{r }
+#| eval: true
+#| echo: false
+library(stargazer)
+options(scipen = 999)
+df <- read.csv("https://edward-vytlacil.github.io/Data/PROGRESA.csv", header=TRUE, sep=",") # read csv
+df$treat <- df$progresa1 
+df$girl <- df$sex1 
+df<-subset(df, wave==4 | wave==1,
+           select= c(sooloca,sooind_id,age1,hgc1,school,treat,girl,wave))
+balanced_ids <- intersect(df[df$wave==4,"sooind_id"],
+                  df[df$wave==1 & df$age1>=6 & df$age1<=16,"sooind_id"])
+df <- df[df$sooind_id %in% balanced_ids & df$wave==4,]
+reg.1 <- lm(school ~ treat * girl, df) 
+V.hc3 <- vcovHC(reg.1) # get heterosckedastic-robust variance-covariance matrix
+b <- coef(reg.1)
+```
+
+## Ex: Progresa, $H_0: \beta_1 = 0$, $\beta_3 = 0$ {auto-animate="true"}
+
+```{r }
+#| eval: false
+#| echo: true
+reg.1 <- lm(school ~ treat * girl, df) # run regression
+V.hc3 <- vcovHC(reg.1) # get heterosckedastic-robust variance-covariance matrix
+b <- coef(reg.1)
+# Wald statistic: (R b - r)' [R V R']^{-1} (R b - r), with r = 0
+Rb <- c(b["treat"], b["treat:girl"])
+RVRT <- V.hc3[c("treat", "treat:girl"), c("treat", "treat:girl")]
+W <- as.numeric(t(Rb) %*% solve(RVRT) %*% Rb)
+pval <- 1 - pchisq(W, df = 2)
+```
+
+## Ex: Progresa, $H_0: \beta_1 = 0$, $\beta_3 = 0$ {auto-animate="true"}
+
+```{r }
+#| eval: false
+#| echo: true
+#| code-line-numbers: "1-4"
+reg.1 <- lm(school ~ treat * girl, df) # run regression
+V.hc3 <- vcovHC(reg.1) # get heterosckedastic-robust variance-covariance matrix
+b <- coef(reg.1)
+b
+# Wald statistic: (R b - r)' [R V R']^{-1} (R b - r), with r = 0
+Rb <- c(b["treat"], b["treat:girl"])
+RVRT <- V.hc3[c("treat", "treat:girl"), c("treat", "treat:girl")]
+W <- as.numeric(t(Rb) %*% solve(RVRT) %*% Rb)
+pval <- 1 - pchisq(W, df = 2)
+```
+
+```{r }
+#| eval: true
+#| echo: false
+round(b,3)
+```
+
+<!-- ## Ex: Progresa, $H_0: \beta_1 = 0$, $\beta_3 = 0$ {auto-animate="true"} -->
+
+<!-- ```{r } -->
+
+<!-- #| eval: false -->
+
+<!-- #| echo: true -->
+
+<!-- #| code-line-numbers: "4-6" -->
+
+<!-- reg.1 <- lm(school ~ treat * girl, df) # run regression -->
+
+<!-- V.hc3 <- vcovHC(reg.1) # get heterosckedastic-robust variance-covariance matrix -->
+
+<!-- b <- coef(reg.1) -->
+
+<!-- # Wald statistic: (R b - r)' [R V R']^{-1} (R b - r), with r = 0 -->
+
+<!-- Rb <- c(b["treat"], b["treat:girl"]) -->
+
+<!-- RVRT <- V.hc3[c("treat", "treat:girl"), c("treat", "treat:girl")] -->
+
+<!-- W <- as.numeric(t(Rb) %*% solve(RVRT) %*% Rb) -->
+
+<!-- pval <- 1 - pchisq(W, df = 2) -->
+
+<!-- ``` -->
+
+<!-- ```{r } -->
+
+<!-- #| eval: true -->
+
+<!-- #| echo: false -->
+
+<!-- Rb <- c(b["treat"], b["treat:girl"]) -->
+
+<!-- RVRT <- V.hc3[c("treat", "treat:girl"), c("treat", "treat:girl")] -->
+
+<!-- ``` -->
+
+## Ex: Progresa, $H_0: \beta_1 = 0$, $\beta_3 = 0$ {auto-animate="true"}
+
+```{r }
+#| eval: false
+#| echo: true
+#| code-line-numbers: "4-8"
+reg.1 <- lm(school ~ treat * girl, df) # run regression
+V.hc3 <- vcovHC(reg.1) # get heterosckedastic-robust variance-covariance matrix
+b <- coef(reg.1)
+# Wald statistic: (R b - r)' [R V R']^{-1} (R b - r), with r = 0
+Rb <- c(b["treat"], b["treat:girl"])
+RVRT <- V.hc3[c("treat", "treat:girl"), c("treat", "treat:girl")]
+Rb
+RVRT
+W <- as.numeric(t(Rb) %*% solve(RVRT) %*% Rb)
+pval <- 1 - pchisq(W, df = 2)
+```
+
+```{r }
+#| eval: true
+#| echo: false
+Rb <- c(b["treat"], b["treat:girl"])
+RVRT <- V.hc3[c("treat", "treat:girl"), c("treat", "treat:girl")]
+round(Rb,3)
+signif(RVRT,2)
+```
+
+[Explanation, interpretation of form of variance
+matrix?]{style="font-size:0.8em;"}
+
+## Ex: Progresa, $H_0: \beta_1 = 0$, $\beta_3 = 0$ {auto-animate="true"}
+
+```{r }
+#| eval: false
+#| echo: true
+#| code-line-numbers: "7-8"
+reg.1 <- lm(school ~ treat * girl, df) # run regression
+V.hc3 <- vcovHC(reg.1) # get heterosckedastic-robust variance-covariance matrix
+b <- coef(reg.1)
+# Wald statistic: (R b - r)' [R V R']^{-1} (R b - r), with r = 0
+Rb <- c(b["treat"], b["treat:girl"])
+RVRT <- V.hc3[c("treat", "treat:girl"), c("treat", "treat:girl")]
+W <- as.numeric(t(Rb) %*% solve(RVRT) %*% Rb)
+W
+pval <- 1 - pchisq(W, df = 2)
+```
+
+```{r }
+#| eval: true
+#| echo: false
+# theta_hat <- c(b["treat"], b["treat:girl"])
+# Sigma_hat <- V[c("treat", "treat:girl"),
+#                c("treat", "treat:girl")]
+Rb <- c(b["treat"], b["treat:girl"])
+RVRT <- V.hc3[c("treat", "treat:girl"), c("treat", "treat:girl")]
+W <- as.numeric(t(Rb) %*% solve(RVRT) %*% Rb) # solve( ) gives matrix inverse
+signif(W,3)
+```
+
+[Note that, for matrix $A$, `solve(A)` inverts matrix
+$A$.]{style="font-size:0.8em;"}
+
+## Ex: Progresa, $H_0: \beta_1 = 0$, $\beta_3 = 0$ {auto-animate="true"}
+
+```{r }
+#| eval: false
+#| echo: true
+#| code-line-numbers: "8-9"
+reg.1 <- lm(school ~ treat * girl, df) # run regression
+V.hc3 <- vcovHC(reg.1) # get heterosckedastic-robust variance-covariance matrix
+b <- coef(reg.1)
+# Wald statistic: (R b - r)' [R V R']^{-1} (R b - r), with r = 0
+Rb <- c(b["treat"], b["treat:girl"])
+RVRT <- V.hc3[c("treat", "treat:girl"), c("treat", "treat:girl")]
+W <- as.numeric(t(Rb) %*% solve(RVRT) %*% Rb) # solve( ) gives matrix inverse
+pval <- 1 - pchisq(W, df = 2)
+pval
+```
+
+```{r }
+#| eval: true
+#| echo: false
+pval <- 1 - pchisq(W, df = 2)
+signif(pval,2)
+```
+
+## Inverting the Wald Test
+
+The $(1-\alpha)$ confidence set for $R\beta$ obtained by inverting the
+Wald test is given by \begin{align*}
+& \mathcal{C}_{1-\alpha}\\
+& =
+\left\{
+b \in \mathbb{R}^q :
+T_N(b) \le \chi^2_{q,1-\alpha}
+\right\}\\
+& =
+\left\{
+b \in \mathbb{R}^q: \right.\\
+& \qquad  \left.
+(R\hat\beta - b)^\top
+\left(R(\widehat{\Sigma}/N)R^\top\right)^{-1}
+(R\hat\beta - b)
+\le
+\chi^2_{q,1-\alpha}
+\right\}.
+\end{align*} where $\chi^2_{q,1-\alpha}$ is the $1-\alpha$ quantile of
+$\chi_q^2$. $\mathcal{C}_{1-\alpha}$ is an ellipsoid centered at
+$R\hat\beta$ with shape determined by $R\widehat{\Sigma}R^\top$.
+
+## 95% Confidence Set: ($\beta_1,\beta_3$)
+
+:::::: columns
+::: {.column width="71%"}
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-width: 9
+#| fig-height: 5.5
+#| out-width: "100%"
+#| fig.align: "center"
+library(ggplot2)
+library(ellipse)
+library(sandwich)
+
+b <- coef(reg.1)
+V <- vcovHC(reg.1, type = "HC3")
+
+theta_hat <- c(b["treat"], b["treat:girl"])
+Sigma_hat <- V[c("treat","treat:girl"),
+               c("treat","treat:girl")]
+
+ell <- as.data.frame(ellipse(Sigma_hat, centre = theta_hat, level = 0.95))
+colnames(ell) <- c("beta1","beta3")
+
+ggplot(ell) +
+  geom_path(aes(x = beta1, y = beta3),linewidth = 1.2) +
+  geom_point(aes(x = theta_hat[1], y = theta_hat[2]),size = 2.5) +
+  labs(x = expression(beta[1]),
+       y = expression(beta[3]))  +
+  theme_minimal(base_size = 18) +
+  coord_equal()
+```
+:::
+
+:::: {.column width="29%"}
+::: {style="font-size:0.57em; line-height:1.15;"}
+**HC3 estimate of** $\widehat{\Sigma}/N$ for $(\beta_1,\beta_3)$
+
+```{r}
+#| echo: false
+#| results: asis
+M <- formatC(Sigma_hat, format = "f", digits = 6)
+
+cat("<table style='border-collapse:collapse; width:100%; text-align:center;'>")
+
+cat("<tr>
+       <th></th>
+       <th>$\\beta_1$</th>
+       <th>$\\beta_3$</th>
+     </tr>")
+
+cat(sprintf("<tr>
+       <th style='text-align:left;'>$\\beta_1$</th>
+       <td>%s</td>
+       <td>%s</td>
+     </tr>", M[1,1], M[1,2]))
+
+cat(sprintf("<tr>
+       <th style='text-align:left;'>$\\beta_3$</th>
+       <td>%s</td>
+       <td>%s</td>
+     </tr>", M[2,1], M[2,2]))
+
+cat("</table>")
+```
+
+-   Off-diagonal is large and negative (explanation?)
+
+-   Variances unequal
+
+-   Tilted, elongated ellipse
+:::
+::::
+::::::
+
+[Inverting Wald test to construct 95% confidence set on
+$(\beta_1,\beta_3)$.]{style="font-size:0.8em;"}
+
+## 95% Confidence Set: ($\beta_1,\beta_1+\beta_3$)
+
+:::::: columns
+::: {.column width="70%"}
+```{r }
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-width: 9
+#| fig-height: 5.5
+#| out-width: "100%"
+#| fig.align: "center"      
+# 95% Wald confidence ellipse for (beta_1, beta_1 + beta_3) using HC3
+# 
+# library(sandwich)
+# library(ggplot2)
+# library(ellipse)
+
+# OLS fit (assumes reg.1 already exists)
+b <- coef(reg.1)
+V <- vcovHC(reg.1, type = "HC3")
+
+# Extract (beta1, beta3) = (treat, treat:girl)
+theta_hat <- c(b["treat"], b["treat:girl"])
+Sigma_hat <- V[c("treat", "treat:girl"),
+               c("treat", "treat:girl")]
+
+# Linear transformation: phi = (beta1, beta1 + beta3) = A * theta
+A <- matrix(c(1, 0,
+              1, 1), nrow = 2, byrow = TRUE)
+
+phi_hat <- as.numeric(A %*% theta_hat)
+Sigma_phi <- A %*% Sigma_hat %*% t(A)
+
+# Ellipse points
+ell <- as.data.frame(
+  ellipse(Sigma_phi, centre = phi_hat, level = 0.95)
+)
+colnames(ell) <- c("beta1", "beta1_plus_beta3")
+
+# Plot
+ggplot(ell) +
+  geom_path(aes(x = beta1, y = beta1_plus_beta3),linewidth = 1.2) +
+  geom_point(aes(x = phi_hat[1], y = phi_hat[2]),size = 2.5) +
+  labs(x = expression(beta[1]),
+       y = expression(beta[1] + beta[3]))  +
+  theme_minimal(base_size = 18) +
+  coord_equal()
+  
+```
+:::
+
+:::: {.column width="30%"}
+::: {style="font-size:0.57em; line-height:1.15;"}
+**HC3 estimate of** $R(\widehat{\Sigma}/N)R^\top$ for
+$R \beta=(\beta_1,\beta_1+\beta_3)$
+
+```{r}
+#| echo: false
+#| results: asis
+
+M <- formatC(Sigma_phi, format = "f", digits = 6)
+
+cat("<table style='border-collapse:collapse; width:100%; text-align:center;'>")
+
+cat("<tr>
+       <th></th>
+       <th>$\\beta_1$</th>
+       <th>$\\beta_1+\\beta_3$</th>
+     </tr>")
+
+cat(sprintf("<tr>
+       <th style='text-align:left;'>$\\beta_1$</th>
+       <td>%s</td>
+       <td>%s</td>
+     </tr>", M[1,1], M[1,2]))
+
+cat(sprintf("<tr>
+       <th style='text-align:left;'>$\\beta_1+\\beta_3$</th>
+       <td>%s</td>
+       <td>%s</td>
+     </tr>", M[2,1], M[2,2]))
+
+cat("</table>")
+```
+
+-   Off-diagonal is zero (explanation?)
+
+-   Variances close to equal
+
+-   Confidence set close to circular
+:::
+::::
+::::::
+
+[Inverting Wald test to construct 95% confidence set on
+$(\beta_1,\beta_1+\beta_3)$.]{style="font-size:0.8em;"}
+
+## Joint vs Marginal Inference: Ellipse vs Rectangle
+
+-   The 95% Wald confidence set is an **ellipse**, in this example, an
+    ellipse in $\mathbb{R}^2.$
+
+-   If instead we invert two two-sided 5% t-tests, we obtain marginal
+    CIs: $$
+    \text{CI}_1 = \hat\beta_1 \pm z_{0.975}\,\text{se}(\hat\beta_1),
+    \qquad
+    \text{CI}_3 = \hat\beta_3 \pm z_{0.975}\,\text{se}(\hat\beta_3).
+    $$
+
+-   Their intersection is the **rectangle**
+    $\text{CI}_1 \times \text{CI}_3.$
+
+## Key Difference
+
+-   The ellipse is a **joint 95% confidence set** for the vector
+    $(\beta_1, \beta_3)$.
+-   The rectangle is the intersection of two marginal 95% statements.
+-   The rectangle is **not** a 95% joint confidence set for
+    $\beta_1, \beta_3$.
+-   The shapes differ because:
+    -   Wald uses the full covariance matrix.
+    -   Marginal t-tests examine coordinates separately.
+
+## 95% Confidence Set: ($\beta_1,\beta_3$)
+
+:::::: columns
+::: {.column width="71%"}
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-width: 9
+#| fig-height: 5.5
+#| out-width: "100%"
+#| fig.align: "center"
+library(ggplot2)
+library(ellipse)
+library(sandwich)
+
+b <- coef(reg.1)
+V <- vcovHC(reg.1, type = "HC3")
+
+theta_hat <- c(b["treat"], b["treat:girl"])
+Sigma_hat <- V[c("treat","treat:girl"),
+               c("treat","treat:girl")]
+
+# Marginal 95% CIs from separate 5% t-tests (z_{0.975})
+z <- qnorm(0.975)
+ci_beta1 <- theta_hat[1] + c(-1, 1) * z * sqrt(Sigma_hat[1,1])
+ci_beta3 <- theta_hat[2] + c(-1, 1) * z * sqrt(Sigma_hat[2,2])
+
+rect_ci <- data.frame(
+  xmin = ci_beta1[1], xmax = ci_beta1[2],
+  ymin = ci_beta3[1], ymax = ci_beta3[2]
+)
+
+ell <- as.data.frame(ellipse(Sigma_hat, centre = theta_hat, level = 0.95))
+colnames(ell) <- c("beta1","beta3")
+
+ggplot(ell) +
+  geom_path(aes(x = beta1, y = beta3), linewidth = 1.2) +
+  geom_point(aes(x = theta_hat[1], y = theta_hat[2]), size = 2.5) +
+  geom_rect(
+    data = rect_ci,
+    aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+    inherit.aes = FALSE,
+    fill = NA,
+    linetype = "dashed"
+  ) +
+  geom_vline(xintercept = ci_beta1, linetype = "dashed") +
+  geom_hline(yintercept = ci_beta3, linetype = "dashed") +
+  labs(x = expression(beta[1]),
+       y = expression(beta[3])) +
+  theme_minimal(base_size = 18) +
+  coord_equal()
+```
+:::
+
+:::: {.column width="29%"}
+::: {style="font-size:0.7em; line-height:1.15;"}
+-   Dashed vertical lines: marginal 95% CI for $\beta_1$ from inverting
+    a two-sided t-test.
+-   Dashed horizontal lines: marginal 95% CI for $\beta_3$ from inverting  a two-sided t-test.
+-   The dashed rectangle is the intersection of the two marginal CI statements.
+:::
+::::
+::::::
+
+-   Acceptance regions differ (ellipse vs rectangle).
+
+## 95% Confidence Set: ($\beta_1,\beta_1+\beta_3$)
+
+:::::: columns
+::: {.column width="71%"}
+```{r }
+b <- coef(reg.1)
+V <- vcovHC(reg.1, type = "HC3")
+
+theta_hat <- c(b["treat"], b["treat:girl"])
+Sigma_hat <- V[c("treat", "treat:girl"),
+               c("treat", "treat:girl")]
+
+A <- matrix(c(1, 0,
+              1, 1), nrow = 2, byrow = TRUE)
+
+phi_hat <- as.numeric(A %*% theta_hat)
+Sigma_phi <- A %*% Sigma_hat %*% t(A)
+
+# Marginal 95% CIs from separate 5% t-tests (z_{0.975})
+z <- qnorm(0.975)
+ci_beta1 <- phi_hat[1] + c(-1, 1) * z * sqrt(Sigma_phi[1,1])
+ci_b1pb3 <- phi_hat[2] + c(-1, 1) * z * sqrt(Sigma_phi[2,2])
+
+rect_ci <- data.frame(
+  xmin = ci_beta1[1], xmax = ci_beta1[2],
+  ymin = ci_b1pb3[1], ymax = ci_b1pb3[2]
+)
+
+ell <- as.data.frame(ellipse(Sigma_phi, centre = phi_hat, level = 0.95))
+colnames(ell) <- c("beta1", "beta1_plus_beta3")
+
+ggplot(ell) +
+  geom_path(aes(x = beta1, y = beta1_plus_beta3), linewidth = 1.2) +
+  geom_point(aes(x = phi_hat[1], y = phi_hat[2]), size = 2.5) +
+  geom_rect(
+    data = rect_ci,
+    aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+    inherit.aes = FALSE,
+    fill = NA,
+    linetype = "dashed"
+  ) +
+  geom_vline(xintercept = ci_beta1, linetype = "dashed") +
+  geom_hline(yintercept = ci_b1pb3, linetype = "dashed") +
+  labs(x = expression(beta[1]),
+       y = expression(beta[1] + beta[3])) +
+  theme_minimal(base_size = 18) +
+  coord_equal()
+  
+```
+:::
+
+:::: {.column width="29%"}
+::: {style="font-size:0.7em; line-height:1.15;"}
+-   Dashed vertical lines: marginal 95% CI for $\beta_1$ from inverting
+    a two-sided t-test.
+-   Dashed horizontal lines: marginal 95% CI for $\beta_1+\beta_3$ from inverting  a two-sided t-test.
+-   The dashed rectangle is the intersection of the two marginal CI statements.
+:::
+::::
+::::::
+
+-   Acceptance regions differ (ellipse vs rectangle).
+
