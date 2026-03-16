@@ -1327,7 +1327,7 @@ margin-right: 0; }
 <ul>
 <li><p>Given <span class="math inline">\(B\)</span> bootstrap replications, define <span class="math inline">\(q^*_{\alpha}\)</span> as the <span class="math inline">\(\alpha\)</span> empirical quantile of <span class="math inline">\((\widehat \theta_n^*(1),\widehat \theta_n^*(2),…,\widehat\theta^*_{n}(B))\)</span></p>
 <ul>
-<li>compute <span class="math inline">\(q^*_{\alpha}\)</span> as the smallest value such that fraction <span class="math inline">\(\alpha\)</span> of the bootstrap replications are less than <span class="math inline">\(q^*_{\alpha}\)</span>.</li>
+<li>compute <span class="math inline">\(q^*_{\alpha}\)</span> as the smallest value such that at least a fraction <span class="math inline">\(\alpha\)</span> of the bootstrap replications are less than or equal to it.</li>
 </ul></li>
 <li><p>Bootstrap Percentile CI: <span class="math display">\[C^{pc}= [q^*_{\alpha/2},~ q^*_{1-\alpha/2}].\]</span></p></li>
 <li><p>Uses quantiles of the bootstrap distribution as proxies for quantiles of sampling distribution of <span class="math inline">\(\widehat \theta_{n}\)</span>.</p></li>
