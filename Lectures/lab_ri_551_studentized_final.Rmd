@@ -1,0 +1,533 @@
+---
+title: 'Code for Randomization Inference and Multiple Hypothesis Testing'
+output:
+  html_document:
+    df_print: paged
+fig_caption: yes
+---
+
+```{r setup, include=FALSE, echo=FALSE}
+rm(list = ls())
+require("knitr")
+opts_chunk$set(echo = TRUE)
+library(modelsummary, quietly = TRUE)
+library(ggplot2, quietly = TRUE)
+library(ri2, quietly = TRUE)  # package for randomization inference.
+
+round_df <- function(x, digits = 3) {
+  out <- x
+  num_cols <- vapply(out, is.numeric, logical(1))
+  out[num_cols] <- lapply(out[num_cols], round, digits = digits)
+  out
+}
+```
+ 
+## Part 1. Setup
+
+### 1. read in the data, repeating steps from earlier labs
+
++ Use `read.table` to import the data set [PROGRESA.csv](https://www.dropbox.com/s/9hla4hmn84gmbko/PROGRESA.csv?dl=0). 
++ Read [readme.txt](https://www.dropbox.com/s/ynqfuyliyvxmw8n/readme.txt?dl=0) 
++ Note `hgc1` is the highest grade completed, and `school` is an indicator for being enrolled in school, so, if they are enrolled in school, then they are enrolled in grade `hgc1`+1.   
+
+```{r}
+df_ <- read.csv("https://edward-vytlacil.github.io/Data/PROGRESA.csv",
+                    header=TRUE, sep=",") # read csv# Will only use data from wave 4
+df_$treat <- df_$progresa1 
+df_$girl <- df_$sex1
+df_$age1 <- ifelse(df_$age1>=6 & df_$age1<=18, df_$age1, NA)  
+balanced_ids <- intersect(df_[df_$wave==4,"sooind_id"],
+                  df_[df_$wave==1 & df_$age1>=6 & df_$age1<=16,"sooind_id"])
+df_ <- df_[df_$sooind_id %in% balanced_ids,] 
+dfPost<-subset(df_, wave==4,select= c(sooloca,sooind_id,age1,hgc1,school,treat,girl,wave))
+rm(df_)
+
+```
+
+
++ Can we do randomization inference using all possible assignments of treatment in this application?
++ Impossible.
++ Too many permutations to create full matrix of permutations, cannot consider all permutations.
+
+
+```{r }
+
+n.0<- length(unique(dfPost$sooloca))
+m.0<- length(unique(subset(dfPost,dfPost$treat==1)$sooloca))
+
+n.0
+m.0
+
+choose(n.0,m.0)
+```
+
+###   randomization inference using ri2 package
+
++ make sure to install and load ri2 package.  
++ Doing randomization inference not on full set of possible permutations but on random  draws from the full 2.452172e+139 possible number of possible permutations.
+
+
+```{r}
+
+set.seed(123)
+
+#sims<-3000
+sims<-10000  # defining constant, number of simulations to do
+ 
+# 
+# defining function for randomization inference
+# argument is the data frame, make it easier to do 
+# on alternative subsets of data
+#
+
+f.ri <- function(d){
+  
+n.0<- length(unique(d$sooloca))
+m.0<- length(unique(subset(d,d$treat==1)$sooloca))
+
+declaration_ra<-declare_ra(N=n.0,m=m.0,clusters=d$sooloca)
+
+ri_out <-  conduct_ri(
+     test_function = function(d){abs(mean(d[d$treat==1,]$school) - mean(d[d$treat==0,]$school))},
+    declaration = declaration_ra,
+    assignment = "treat",
+      outcome = "school",
+    data = d,
+    sims = sims
+  )
+ri_out}
+
+# full sample
+
+ri.fullsample<- f.ri(dfPost)
+summary(ri.fullsample)
+plot(ri.fullsample)
+
+
+# same as above, but now
+# separately by boys vs girls
+
+ri.bysex<- by(dfPost, dfPost$girl,f.ri)  # "by" similar to tapply, applying f.ri to dfPost by levels of dfPost$girl
+summary(ri.bysex[[1]]) # boys
+summary(ri.bysex[[2]]) # girls
+plot(ri.bysex[[1]]) +ggtitle("Randomization Inference: Boys")
+plot(ri.bysex[[2]]) +ggtitle("Randomization Inference: Girls")
+
+# same as above, but now
+# separately by (sex, highest grade completed)
+# Use the actual observed hgc1 values rather than hard-coding 1:10.
+grade_values <- sort(unique(na.omit(dfPost$hgc1)))
+
+pvalues.boys <- sapply(grade_values, function(g){
+  summary(f.ri(subset(dfPost, girl == 0 & hgc1 == g)))$two_tailed_p_value
+})
+
+pvalues.girls <- sapply(grade_values, function(g){
+  summary(f.ri(subset(dfPost, girl == 1 & hgc1 == g)))$two_tailed_p_value
+})
+
+results.p <- data.frame(
+  Grade = grade_values,
+  `p-value boys` = pvalues.boys,
+  `p-value girls` = pvalues.girls,
+  check.names = FALSE
+)
+
+# example plot: girls, grade 6
+ri.girls.grade6 <- f.ri(subset(dfPost, girl == 1 & hgc1 == 6))
+plot(ri.girls.grade6) + ggtitle("Randomization Inference of Sharp Null of No Effect, Girls, Grade 6")
+```
+
+
+```{r, results='asis'}
+# Use modelsummary to report a table.
+modelsummary::datasummary_df(
+  round_df(results.p, 3),
+  title = "p-values, inference by sex and grade",
+  output = "markdown"
+)
+```
+
+## Multiple hypothesis testing corrections
+ 
+```{r, results='asis'}
+
+varlabels  <- grade_values
+ 
+f.adjust <- function(x,label){
+  data.frame(
+    Grade = label,
+    `No Correction` = x,
+    Bonferroni = p.adjust(x, method = "bonferroni"),
+    `Holm's` = p.adjust(x, method = "holm"),
+    check.names = FALSE
+  )
+}
+
+modelsummary::datasummary_df(
+  round_df(f.adjust(pvalues.boys, varlabels), 3),
+  title = "P-Values: Boys, Testing Sharp Null of No Treatment Effect",
+  output = "markdown"
+)
+
+modelsummary::datasummary_df(
+  round_df(f.adjust(pvalues.girls, varlabels), 3),
+  title = "P-Values: Girls, Testing Sharp Null of No Treatment Effect",
+  output = "markdown"
+)
+
+```
+
+## Romano--Wolf stepdown correction
+
++ The earlier `ri2` code computes randomization-inference p-values separately for each hypothesis.  That is enough for no correction, Bonferroni, and Holm, because those methods only need the individual p-values.
++ Romano--Wolf is different: for each randomization draw, it needs the full vector of test statistics across the family, all computed from the same village-level reassignment.
++ So for the final comparison table below, we re-compute all four columns --- no correction, Bonferroni, Holm, and Romano--Wolf --- from one common bank of village-level random assignments.  This makes the final table internally comparable across methods.
++ To keep the statistic consistent with the earlier `ri2` code, the statistic here is the same two-sided unstudentized statistic, `abs(mean(Y_1) - mean(Y_0))`, not a studentized t-statistic.
+
+```{r}
+# Build one common bank of village-level treatment assignments.
+# We will use the same bank for every grade-specific hypothesis in the family.
+make_cluster_draws <- function(d, sims, seed = NULL){
+  villages <- sort(unique(d$sooloca))
+  n_clusters <- length(villages)
+
+  treat_by_cluster <- tapply(d$treat, d$sooloca, function(x) unique(x)[1])
+  W_obs <- as.integer(treat_by_cluster[as.character(villages)])
+  m_treat <- sum(W_obs)
+
+  if(!is.null(seed)) set.seed(seed)
+
+  W_perm <- replicate(sims, {
+    w <- integer(n_clusters)
+    w[sample.int(n_clusters, m_treat)] <- 1L
+    w
+  })
+
+  list(
+    villages = villages,
+    W_obs = W_obs,
+    W_perm = W_perm,
+    sims = sims
+  )
+}
+
+aggregate_by_cluster <- function(d_sub, villages){
+  n_vec <- numeric(length(villages))
+  y_vec <- numeric(length(villages))
+
+  if(nrow(d_sub) > 0){
+    n_tab <- tapply(!is.na(d_sub$school), d_sub$sooloca, sum)
+    y_tab <- tapply(d_sub$school, d_sub$sooloca, sum, na.rm = TRUE)
+
+    n_vec[match(names(n_tab), villages)] <- as.numeric(n_tab)
+    y_vec[match(names(y_tab), villages)] <- as.numeric(y_tab)
+  }
+
+  list(n_vec = n_vec, y_vec = y_vec)
+}
+
+# Match the earlier ri2 test statistic: absolute difference in means.
+# This is a two-sided, unstudentized statistic.
+abs_diff_in_means <- function(treat_y, treat_n, control_y, control_n){
+  out <- abs(treat_y / treat_n - control_y / control_n)
+  out[treat_n == 0 | control_n == 0] <- NA_real_
+  out
+}
+
+stat_from_assignment <- function(y_vec, n_vec, w){
+  treat_n <- sum(n_vec * w)
+  control_n <- sum(n_vec) - treat_n
+  treat_y <- sum(y_vec * w)
+  control_y <- sum(y_vec) - treat_y
+
+  abs_diff_in_means(treat_y, treat_n, control_y, control_n)
+}
+
+stats_from_permutations <- function(y_vec, n_vec, W_perm){
+  treat_n <- colSums(W_perm * n_vec)
+  control_n <- sum(n_vec) - treat_n
+  treat_y <- colSums(W_perm * y_vec)
+  control_y <- sum(y_vec) - treat_y
+
+  abs_diff_in_means(treat_y, treat_n, control_y, control_n)
+}
+
+# Romano--Wolf stepdown adjusted p-values based on the common
+# permutation matrix of test statistics.
+romano_wolf_adjust <- function(T_obs, T_perm){
+  K <- length(T_obs)
+  ord <- order(T_obs, decreasing = TRUE)
+  step_p <- numeric(K)
+
+  for(j in seq_len(K)){
+    idx <- ord[j:K]
+    max_perm <- apply(T_perm[, idx, drop = FALSE], 1, max, na.rm = TRUE)
+    if(all(is.infinite(max_perm))){
+      step_p[j] <- NA_real_
+    } else {
+      valid <- is.finite(max_perm)
+      step_p[j] <- (1 + sum(max_perm[valid] >= T_obs[ord[j]])) / (1 + sum(valid))
+    }
+  }
+
+  adj_ord <- cummax(step_p)
+  adj <- numeric(K)
+  adj[ord] <- adj_ord
+  adj
+}
+
+# For one family of hypotheses (here, grades within sex), compute:
+# raw permutation p-values, Bonferroni, Holm, and Romano--Wolf.
+ri_family_table <- function(d, perm_obj, grades = sort(unique(na.omit(d$hgc1)))){
+  K <- length(grades)
+  T_obs <- numeric(K)
+  T_perm <- matrix(NA_real_, nrow = perm_obj$sims, ncol = K)
+
+  for(j in seq_along(grades)){
+    g <- grades[j]
+    d_g <- subset(d, hgc1 == g)
+    agg <- aggregate_by_cluster(d_g, perm_obj$villages)
+
+    T_obs[j] <- stat_from_assignment(agg$y_vec, agg$n_vec, perm_obj$W_obs)
+    T_perm[, j] <- stats_from_permutations(agg$y_vec, agg$n_vec, perm_obj$W_perm)
+  }
+
+  # Raw randomization-inference p-values from the same common bank of draws.
+  p_raw <- numeric(K)
+  for(j in seq_len(K)){
+    valid <- !is.na(T_perm[, j])
+    p_raw[j] <- (1 + sum(T_perm[valid, j] >= T_obs[j])) / (1 + sum(valid))
+  }
+
+  p_rw <- romano_wolf_adjust(T_obs, T_perm)
+
+  data.frame(
+    Grade = grades,
+    `No Correction` = p_raw,
+    Bonferroni = p.adjust(p_raw, method = "bonferroni"),
+    `Holm's` = p.adjust(p_raw, method = "holm"),
+    `Romano-Wolf` = p_rw,
+    check.names = FALSE
+  )
+}
+```
+
+```{r, results='asis'}
+# Use one common bank of village-level random assignments for the final
+# comparison table so that differences across methods reflect only the
+# correction method, not different simulation draws.
+perm_obj <- make_cluster_draws(dfPost, sims = sims, seed = 123)
+
+grade_values_boys  <- sort(unique(na.omit(subset(dfPost, girl == 0)$hgc1)))
+grade_values_girls <- sort(unique(na.omit(subset(dfPost, girl == 1)$hgc1)))
+
+rw_boys <- ri_family_table(subset(dfPost, girl == 0), perm_obj = perm_obj, grades = grade_values_boys)
+rw_girls <- ri_family_table(subset(dfPost, girl == 1), perm_obj = perm_obj, grades = grade_values_girls)
+
+modelsummary::datasummary_df(
+  round_df(rw_boys, 3),
+  title = "P-Values: Boys, No Correction vs Bonferroni vs Holm vs Romano-Wolf",
+  output = "markdown"
+)
+
+modelsummary::datasummary_df(
+  round_df(rw_girls, 3),
+  title = "P-Values: Girls, No Correction vs Bonferroni vs Holm vs Romano-Wolf",
+  output = "markdown"
+)
+```
+
+
+## Studentized randomization inference following Bugni, Canay, Shaikh, and Tabord-Meehan
+
++ In the sections above, the test statistic was the absolute value of the child-weighted difference in means.
++ We now redo the analysis using the studentized statistic
++ $$T_j = |\hat\tau_j| / \hat s_j,$$
++ where $\hat\tau_j$ is the same child-weighted difference in means, written as a weighted difference in village-level cell means.
++ For each sex-grade cell $j$, let $n_{vj}$ be the number of sampled children in village $v$ in that cell and let $\bar Y_{vj}$ be the village-level mean attendance in that cell.
++ Then
++ $$\hat\tau_j = \frac{\sum_v n_{vj} D_v \bar Y_{vj}}{\sum_v n_{vj} D_v} - \frac{\sum_v n_{vj} (1-D_v) \bar Y_{vj}}{\sum_v n_{vj} (1-D_v)}.$$
++ We take $\hat s_j$ from the village-clustered sandwich variance for the corresponding weighted regression of $\bar Y_{vj}$ on treatment with weights $n_{vj}$, following the size-weighted cluster-level analysis in Bugni, Canay, Shaikh, and Tabord-Meehan.  In this one-regressor weighted regression, that sandwich variance simplifies to the formula coded below.
++ As above, we use one common bank of village-level random assignments so that the no-correction, Bonferroni, Holm, and Romano--Wolf columns are directly comparable.
+
+```{r}
+# Studentized statistic following the size-weighted cluster-level setup of
+# Bugni, Canay, Shaikh, and Tabord-Meehan.
+# For a given sex-grade cell j, this keeps the same child-weighted effect
+# as above, but now studentizes it using the village-clustered sandwich SE
+# from the corresponding weighted regression of village-cell means on treatment.
+
+bcs_stat_from_assignment <- function(y_vec, n_vec, w){
+  keep <- n_vec > 0 & !is.na(n_vec)
+  n <- n_vec[keep]
+  y_sum <- y_vec[keep]
+  w <- as.numeric(w[keep])
+
+  if(length(n) == 0 || length(unique(w)) < 2){
+    return(c(tau = NA_real_, se = NA_real_, stat = NA_real_))
+  }
+
+  N1 <- sum(n * w)
+  N0 <- sum(n * (1 - w))
+  if(N1 <= 0 || N0 <= 0){
+    return(c(tau = NA_real_, se = NA_real_, stat = NA_real_))
+  }
+
+  mu1 <- sum(y_sum * w) / N1
+  mu0 <- sum(y_sum * (1 - w)) / N0
+  tau <- mu1 - mu0
+
+  # In this special case, the village-clustered sandwich variance of the
+  # weighted regression coefficient simplifies to the expression below.
+  a <- y_sum^2
+  b <- n * y_sum
+  c <- n^2
+
+  s1a <- sum(w * a)
+  s1b <- sum(w * b)
+  s1c <- sum(w * c)
+  s0a <- sum(a) - s1a
+  s0b <- sum(b) - s1b
+  s0c <- sum(c) - s1c
+
+  rss1 <- s1a - 2 * mu1 * s1b + mu1^2 * s1c
+  rss0 <- s0a - 2 * mu0 * s0b + mu0^2 * s0c
+  se2 <- rss1 / (N1^2) + rss0 / (N0^2)
+
+  if(!is.finite(se2) || is.na(se2) || se2 < 0){
+    se <- NA_real_
+    stat <- NA_real_
+  } else if(se2 == 0){
+    se <- 0
+    stat <- if(abs(tau) > 0) Inf else 0
+  } else {
+    se <- sqrt(se2)
+    stat <- abs(tau) / se
+  }
+
+  c(tau = tau, se = se, stat = stat)
+}
+
+bcs_stats_from_permutations <- function(y_vec, n_vec, W_perm){
+  keep <- n_vec > 0 & !is.na(n_vec)
+  n <- n_vec[keep]
+  y_sum <- y_vec[keep]
+  W_use <- W_perm[keep, , drop = FALSE]
+
+  if(length(n) == 0){
+    return(rep(NA_real_, ncol(W_perm)))
+  }
+
+  N1 <- colSums(W_use * n)
+  N0 <- sum(n) - N1
+  Y1 <- colSums(W_use * y_sum)
+  Y0 <- sum(y_sum) - Y1
+
+  mu1 <- Y1 / N1
+  mu0 <- Y0 / N0
+  tau <- mu1 - mu0
+
+  a <- y_sum^2
+  b <- n * y_sum
+  c <- n^2
+
+  S1a <- colSums(W_use * a)
+  S1b <- colSums(W_use * b)
+  S1c <- colSums(W_use * c)
+  S0a <- sum(a) - S1a
+  S0b <- sum(b) - S1b
+  S0c <- sum(c) - S1c
+
+  rss1 <- S1a - 2 * mu1 * S1b + mu1^2 * S1c
+  rss0 <- S0a - 2 * mu0 * S0b + mu0^2 * S0c
+  se2 <- rss1 / (N1^2) + rss0 / (N0^2)
+
+  stat <- rep(NA_real_, length(se2))
+  bad <- !is.finite(se2) | is.na(se2) | se2 < 0 | N1 <= 0 | N0 <= 0
+  zero_se <- !bad & se2 == 0
+  good <- !bad & se2 > 0
+
+  stat[good] <- abs(tau[good]) / sqrt(se2[good])
+  stat[zero_se] <- ifelse(abs(tau[zero_se]) > 0, Inf, 0)
+  stat
+}
+
+ri_family_table_studentized <- function(d, perm_obj, grades = sort(unique(na.omit(d$hgc1)))){
+  K <- length(grades)
+  T_obs <- numeric(K)
+  T_perm <- matrix(NA_real_, nrow = perm_obj$sims, ncol = K)
+
+  for(j in seq_along(grades)){
+    g <- grades[j]
+    d_g <- subset(d, hgc1 == g)
+    agg <- aggregate_by_cluster(d_g, perm_obj$villages)
+
+    obs_out <- bcs_stat_from_assignment(agg$y_vec, agg$n_vec, perm_obj$W_obs)
+    T_obs[j] <- obs_out["stat"]
+    T_perm[, j] <- bcs_stats_from_permutations(agg$y_vec, agg$n_vec, perm_obj$W_perm)
+  }
+
+  p_raw <- numeric(K)
+  for(j in seq_len(K)){
+    valid <- is.finite(T_perm[, j])
+    if(!is.finite(T_obs[j])){
+      p_raw[j] <- NA_real_
+    } else {
+      p_raw[j] <- (1 + sum(T_perm[valid, j] >= T_obs[j])) / (1 + sum(valid))
+    }
+  }
+
+  p_rw <- romano_wolf_adjust(T_obs, T_perm)
+
+  data.frame(
+    Grade = grades,
+    `No Correction` = p_raw,
+    Bonferroni = p.adjust(p_raw, method = "bonferroni"),
+    `Holm's` = p.adjust(p_raw, method = "holm"),
+    `Romano-Wolf` = p_rw,
+    check.names = FALSE
+  )
+}
+```
+
+```{r, results='asis'}
+student_boys <- ri_family_table_studentized(
+  subset(dfPost, girl == 0),
+  perm_obj = perm_obj,
+  grades = grade_values_boys
+)
+student_girls <- ri_family_table_studentized(
+  subset(dfPost, girl == 1),
+  perm_obj = perm_obj,
+  grades = grade_values_girls
+)
+
+student_results <- merge(
+  student_boys[, c("Grade", "No Correction")],
+  student_girls[, c("Grade", "No Correction")],
+  by = "Grade",
+  all = TRUE,
+  suffixes = c(" boys", " girls")
+)
+
+names(student_results) <- c("Grade", "p-value boys", "p-value girls")
+
+modelsummary::datasummary_df(
+  round_df(student_results, 3),
+  title = "Studentized p-values, inference by sex and grade",
+  output = "markdown"
+)
+
+modelsummary::datasummary_df(
+  round_df(student_boys, 3),
+  title = "Studentized P-Values: Boys, No Correction vs Bonferroni vs Holm vs Romano-Wolf",
+  output = "markdown"
+)
+
+modelsummary::datasummary_df(
+  round_df(student_girls, 3),
+  title = "Studentized P-Values: Girls, No Correction vs Bonferroni vs Holm vs Romano-Wolf",
+  output = "markdown"
+)
+```
