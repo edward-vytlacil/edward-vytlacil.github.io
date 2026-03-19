@@ -2057,7 +2057,7 @@ P(\theta_0 \in C_{n,*}^{pt})
 \end{align*}\]</span></p>
 <p>This holds for any continuous limit distribution <span class="math inline">\(H\)</span>. No symmetry or normality required.</p>
 </section>
-<section id="bootstrap-percentile-t-ci-what-it-leans-on" class="slide level2 scrollable" style="font-size: 0.9em;">
+<section id="bootstrap-percentile-t-ci-what-it-leans-on" class="slide level2 scrollable" style="font-size: 0.85em;">
 <h2>Bootstrap Percentile-t CI: What It Leans On</h2>
 <p><strong>Proof relies on:</strong></p>
 <ol type="1">
@@ -2066,12 +2066,50 @@ P(\theta_0 \in C_{n,*}^{pt})
 </ol>
 <p><strong>Tradeoff:</strong></p>
 <ul>
-<li>Must compute <span class="math inline">\(\widehat{\text{se}}(b)\)</span> on each bootstrap sample using only that replication’s data. Two options:
+<li><p>Must compute <span class="math inline">\(\widehat{\text{se}}(b)\)</span> on each bootstrap sample using only that replication’s data. Two options:</p>
 <ul>
 <li><em>Analytical s.e.:</em> cheap, stable, but requires deriving the formula.</li>
 <li><em>Double bootstrap:</em> no derivation, but dramatic increase in computation and inherits bootstrap s.e. instability (UI failure).</li>
 </ul></li>
-<li>If <span class="math inline">\(\widehat{\text{se}}(b)\)</span> is erratic (e.g., when dividing by <span class="math inline">\(\widehat\beta_2^*\)</span> near zero), the studentized statistic <span class="math inline">\(T_n^*\)</span> is unreliable regardless of which approach is used.</li>
+<li><p>If <span class="math inline">\(\widehat{\text{se}}(b)\)</span> is erratic (e.g., when dividing by <span class="math inline">\(\widehat\beta_2^*\)</span> near zero), the studentized statistic <span class="math inline">\(T_n^*\)</span> is unreliable regardless of which approach is used.</p></li>
+<li><p>The percentile-<span class="math inline">\(t\)</span> CI achieves correct first-order coverage under weaker conditions than the other methods as long the s.e. used is consistent. But studentization also unlocks a <em>higher-order</em> advantage, which we now describe.</p></li>
+</ul>
+</section>
+<section id="asymptotic-pivotalness" class="slide level2" style="font-size: 0.82em;">
+<h2>Asymptotic Pivotalness</h2>
+<div class="callout callout-note callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Definition: Asymptotically Pivotal</strong></p>
+</div>
+<div class="callout-content">
+<p>A test statistic <span class="math inline">\(T_n\)</span> is <strong>asymptotically pivotal</strong> if its limiting distribution under the null does not depend on unknown nuisance parameters.</p>
+</div>
+</div>
+</div>
+<ul>
+<li><p>The studentized statistic <span class="math inline">\(T_n = (\widehat\theta_n - \theta_0)/\widehat{\text{se}}_n\)</span> is asymptotically pivotal: under regularity conditions, <span class="math display">\[T_n \xrightarrow{d} N(0,1),\]</span> which involves no unknowns.</p></li>
+<li><p>The non-studentized statistic <span class="math inline">\(Z_n = \widehat\theta_n - \theta_0\)</span> is <strong>not</strong> asymptotically pivotal: <span class="math display">\[\sqrt{n}\, Z_n \xrightarrow{d} N(0,V),\]</span> and <span class="math inline">\(V\)</span> is unknown.</p></li>
+</ul>
+<!---   Of the three CIs we have considered, only the percentile-$t$ CI is based on the asymptotically pivotal 
+    statistic $T_n$. The normal CI and percentile CI do not studentize 
+    the bootstrap statistic, so neither can achieve asymptotic refinement.-->
+</section>
+<section id="asymptotic-refinement" class="slide level2" style="font-size: 0.82em;">
+<h2>Asymptotic Refinement</h2>
+<p><strong>Asymptotic refinement</strong> (Hansen, Theorem 10.15, in Section 10.20; see also <a href="https://link.springer.com/book/10.1007/978-1-4612-4384-7">Hall, 1992</a>):</p>
+<p>Under Edgeworth expansion conditions, the <strong>coverage probability error</strong> of the percentile-<span class="math inline">\(t\)</span> CI satisfies <span class="math display">\[
+P(\theta_0 \in C^{pt}_n) = (1-\alpha) + O(n^{-1}),
+\]</span> compared to any CI of the form <span class="math inline">\(\widehat\theta_n \pm z_{1-\alpha/2} \cdot \widehat{\text{se}}_n\)</span> with a consistent s.e.: <span class="math display">\[
+P(\theta_0 \in C^{n}_n) = (1-\alpha) + O(n^{-1/2}).
+\]</span> The <span class="math inline">\(O(n^{-1/2})\)</span> error comes from the normal approximation itself, not from how the s.e. is computed.</p>
+<ul>
+<li><p>The bootstrap percentile-<span class="math inline">\(t\)</span> CI eliminates the leading <span class="math inline">\(O(n^{-1/2})\)</span> error term in coverage, achieving an order-of-magnitude improvement. This is possible because <span class="math inline">\(T_n\)</span> is asymptotically pivotal, so the bootstrap only needs to approximate a <strong>fixed, known</strong> limit distribution—and can match it to higher order.</p></li>
+<li><p>The percentile CI also has coverage error <span class="math inline">\(O(n^{-1/2})\)</span>—the same rate as the normal CI—because it does not studentize.</p></li>
+<li><p>So among the three CI methods we have considered, only the percentile-<span class="math inline">\(t\)</span> achieves asymptotic refinement.</p></li>
 </ul>
 </section>
 <section id="bootstrap-percentile-t-ci-finite-sample-diagnostic" class="slide level2">
@@ -2080,21 +2118,24 @@ P(\theta_0 \in C_{n,*}^{pt})
 <li><p><strong>Finite-sample diagnostic:</strong> performs poorly when <span class="math inline">\(\widehat{\text{se}}(b)\)</span> is unstable across replications — the same UI fragility as bootstrap s.e. itself, but now appearing in the denominator of each <span class="math inline">\(T_n^*(b)\)</span>.</p></li>
 <li><p>With <strong>analytical s.e.</strong>, instability arises only when the formula itself is ill-behaved (e.g., <span class="math inline">\(\widehat\beta_2^* \approx 0\)</span>).</p></li>
 <li><p>With <strong>double bootstrap</strong>, instability is compounded: each inner bootstrap s.e. is itself subject to UI failure, and errors propagate into every <span class="math inline">\(T_n^*(b)\)</span>.</p></li>
+<li><p>When <span class="math inline">\(\widehat{\text{se}}(b)\)</span> is well-behaved, the percentile-<span class="math inline">\(t\)</span> CI gains both first-order robustness (no symmetry needed) <em>and</em> higher-order accuracy (asymptotic refinement). When it is not, the refinement advantage is lost and the instability can make the percentile-<span class="math inline">\(t\)</span> CI worse than simpler methods.</p></li>
 </ul>
 </section>
-<section id="robustness-hierarchy-summary" class="slide level2" style="font-size: 0.9em;">
+<section id="robustness-hierarchy-summary" class="slide level2" style="font-size: 0.78em;">
 <h2>Robustness Hierarchy: Summary</h2>
 <table class="caption-top">
 <colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
 </colgroup>
 <thead>
 <tr class="header">
 <th></th>
-<th>Shape requirement</th>
-<th>Moment requirement</th>
+<th>Shape</th>
+<th>Moments</th>
+<th>Higher-order</th>
 </tr>
 </thead>
 <tbody>
@@ -2102,26 +2143,29 @@ P(\theta_0 \in C_{n,*}^{pt})
 <td><strong>Bootstrap normal CI</strong></td>
 <td>Normality</td>
 <td>Consistent bootstrap s.e. (UI)</td>
+<td>No refinement</td>
 </tr>
 <tr class="even">
 <td><strong>Percentile CI</strong></td>
 <td>Symmetry, Continuity</td>
 <td>Quantiles only — no s.e. needed</td>
+<td>No refinement</td>
 </tr>
 <tr class="odd">
 <td><strong>Percentile-t CI</strong></td>
 <td>Continuity</td>
 <td>s.e. on <em>each</em> bootstrap sample</td>
+<td><strong>Refinement</strong> (<span class="math inline">\(O(n^{-1})\)</span>)</td>
 </tr>
 </tbody>
 </table>
 <ul>
-<li><strong>No single method dominates on both dimensions.</strong>
+<li><strong>No single method dominates on all three dimensions.</strong>
 <ul>
 <li>Percentile CI is most robust on moments (uses only quantiles).</li>
-<li>Percentile-t CI is most robust on shape (no symmetry needed).</li>
+<li>Percentile-t CI is most robust on shape (no symmetry needed) <strong>and</strong> achieves asymptotic refinement when s.e. is well-behaved.</li>
 </ul></li>
-<li>In practice: ask which dimension is the binding constraint.
+<li>In practice:
 <ul>
 <li>If the distribution is nearly symmetric but moments are problematic <span class="math inline">\(\Rightarrow\)</span> prefer percentile.</li>
 <li>If the distribution is skewed but moments are well-behaved <span class="math inline">\(\Rightarrow\)</span> prefer percentile-t.</li>
